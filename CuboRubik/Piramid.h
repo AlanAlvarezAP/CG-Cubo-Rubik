@@ -27,7 +27,7 @@ public:
 	std::vector<RGB> lineColors;
 	std::vector<RGB> pointColors;
 public:
-	Sector_Piramid(World* world,const Point& start_point,const Point& end_point,const Point& centro,const float &rad,const float& heig);
+	Sector_Piramid(World* world,const Point& start_point,const Point& end_point,const Point& centro,const float &rad,const float& heig,RGB col);
 	void Generate() override;
 	void DrawGeometry(const Matrix& parent) override;
 };

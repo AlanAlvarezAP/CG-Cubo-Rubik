@@ -15,7 +15,6 @@ public:
 	char axis,type,local_world;
 	float value_total;
 	float duration,elapsed;
-	
 public:
 	Animation_Step(Animatable* targ,float durat,char tp,float val,char ax,char l_w);
 	bool finished();
@@ -24,7 +23,6 @@ public:
 class Animator{
 public:
 	std::vector<std::vector<Animation_Step*>> animations;
-	
 public:
 	Animator() = default;
 	void Add_Animations(std::vector<Animation_Step*> anim,char inv);

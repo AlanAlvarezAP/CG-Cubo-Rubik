@@ -91,9 +91,11 @@ void Piramid::Generate(){
 	float final_sectors_display = 360.0f / (float)amount_sector;
 	const float TRANSFORM = PI / 180.0f;
 
+	RGB colores[]={ColorTable[AMARILLO],ColorTable[CYAN],ColorTable[MAGENTA]};
 
 	Point apice = {center.x,center.y + HEIGHT,center.z,0.0f};
 
+	int conta=0;
 	for(float i = 0.0f; i <= 360.0f; i += final_sectors_display){
 		Point start = {center.x + RADIUS * std::cos(i * TRANSFORM),center.y,center.z + RADIUS * std::sin(i * TRANSFORM),i * TRANSFORM};
 		Point end = {center.x + RADIUS * std::cos((i + final_sectors_display) * TRANSFORM),
@@ -101,7 +103,8 @@ void Piramid::Generate(){
 			center.z + RADIUS * std::sin((i + final_sectors_display) * TRANSFORM),
 			(i + final_sectors_display) * TRANSFORM
 		};
-		Sector_Piramid* sec = new Sector_Piramid(world, start, end, apice, RADIUS, HEIGHT);
+		Sector_Piramid* sec = new Sector_Piramid(world, start, end, apice, RADIUS, HEIGHT,colores[conta%3]);
+		conta++;
 		this->AddChildren(sec);
 		sec->Generate();
 	}
@@ -197,11 +200,8 @@ void Base_Piramid::DrawGeometry(const Matrix& parent){
 }
 
 Sector_Piramid::Sector_Piramid(World* world,const Point& start_point,const Point& end_point,
-	const Point& centro,const float &rad,const float& heigh)
-	:ShapeNode(world,GL_TRIANGLES,"Sector"),
-	startPoint(start_point),endPoint(end_point),center(centro),
-	radius(rad),sector_Start(0),lines_Start(0),height(heigh){
-	ModifiedShaderColor(ColorTable[ARENA].r,ColorTable[ARENA].g,ColorTable[ARENA].b);
+	const Point& centro,const float &rad,const float& heigh,RGB col):ShapeNode(world,GL_TRIANGLES,"Sector"),startPoint(start_point),endPoint(end_point),center(centro),radius(rad),sector_Start(0),lines_Start(0),height(heigh){
+	ModifiedShaderColor(col.r,col.g,col.b);
 }
 
 void Sector_Piramid::Generate(){
@@ -265,25 +265,8 @@ void Sector_Piramid::DrawGeometry(const Matrix& parent){
 	this->Shader.use();
     this->Shader.SetMatrix(parent);
 
-	int conta=0;
     for(int i = sector_Start, tri = 0; i < (int)lines_Start; i += 3, tri++){
-		RGB c;
-		if(conta++ == 0 || conta++ == 1){
-			std::cout << "Entre 1" << std::endl;
-			c = ColorTable[AMARILLO];
-		}else if(conta++ == 2 || conta++ == 3){
-			std::cout << "Entre 2" << std::endl;
-			c = ColorTable[CYAN];
-		}
-		else if(conta++ == 4 || conta++ == 5){
-			std::cout << "Entre 3" << std::endl;
-			c = ColorTable[MAGENTA];
-			
-		}else{
-			conta=0;
-		}
-		
-        this->Shader.SetColor(c.r, c.g, c.b);
+		this->Shader.SetColor(color.r, color.g, color.b);
         glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
 

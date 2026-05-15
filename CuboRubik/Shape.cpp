@@ -92,14 +92,6 @@ void ShapeNode::DrawShape(const Matrix& parent,const Matrix& view,const Matrix& 
 	Matrix global = parent*this->Mat;
 	Shader.SetView(view);
 	Shader.SetProjection(projection);
-	/*Piramid* piramide=dynamic_cast<Piramid*>(this);
-	if(piramide){
-		std::cout << "--------------------" << std::endl;
-		parent.PrintMatrix();
-		global.PrintMatrix();
-		piramide->Mat.PrintMatrix();
-		std::cout << "--------------------" << std::endl;
-	}*/
 	if(IsDrawable){
 		this->DrawGeometry(global);
     }
@@ -195,6 +187,8 @@ void ShapeNode::handleKey(int key, int mods,char CURRENT_AXIS){
 
 void ShapeNode::ApplyAnimation(char type,char axis,char local_world,float step){
 	Matrix *mate=&(this->Mat);
+	std::cout << name << " step: " << step << std::endl;
+	std::cout << name << " matrix: " << mate->matrix[12] << std::endl;
 	switch(type){
 		case 'a':
 		case 's':{

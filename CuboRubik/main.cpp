@@ -140,10 +140,10 @@ void mov_trap(){
 
 void mov_trap_2(){
 
-	Animation_Step* mov1 = new Animation_Step(pizza, 5.0f, 'a', 1.0f, 'x', 'W');
-	Animation_Step* mov2 = new Animation_Step(pizza, 5.0f, 'a', 1.0f, 'y', 'W');
-	Animation_Step* mov3 = new Animation_Step(pizza, 5.0f, 'a', -1.0f, 'x', 'W');
-	Animation_Step* mov4 = new Animation_Step(pizza, 5.0f, 'a', -1.0f, 'y', 'W');
+	Animation_Step* mov1 = new Animation_Step(pizza, 1.0f, 'a', 10.0f, 'x', 'W');
+	Animation_Step* mov2 = new Animation_Step(pizza, 1.0f, 'a', 10.0f, 'y', 'W');
+	Animation_Step* mov3 = new Animation_Step(pizza, 1.0f, 'a', -10.0f, 'x', 'W');
+	Animation_Step* mov4 = new Animation_Step(pizza, 1.0f, 'a', -10.0f, 'y', 'W');
 
 
 	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3,mov4}, 'S');
@@ -380,12 +380,12 @@ int main(){
 	
 	alinear();
 	orbit();
-	rotate_piramid();
+	//rotate_piramid();
 	mov_trap_2();
 	mov_trap();
 	set_Vs();
 	//mundito->print(mundito->root);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	
 
 	float lastTime=glfwGetTime();
