@@ -1,0 +1,439 @@
+/*
+	Pasos basicos para OpenGL
+	1. Inicializar GLFW y el perfil a usar
+	2. Configurar Ventana para hacer contexto esa ventana
+	3. Cargar GLAD
+	4. Colocar Callbacks
+	5. Bucle principal de rendering 
+	5.1 Swapear buffers
+	5.2 Buscar eventos
+*/
+
+#define GLAD_GL_IMPLEMENTATION
+#include <glad/gl.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
+#include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
+
+#include <iostream>
+#include <string>
+
+#include "Shape.h"
+#include "Builder.h"
+
+World* mundito=nullptr;
+GLuint VAO,VBO,EBO;
+unsigned int NUM_REBANADAS=4,SELECT_REBANDA=0;
+char CURRENT_AXIS = 'z';
+Pizza* pizza=nullptr;
+Piramid* piramid=nullptr;
+Cube* cube=nullptr;
+Sphere* sphere = nullptr;
+Tower* tower=nullptr;
+Robot* robot=nullptr;
+Camera* cam=nullptr;
+Animator* anim=nullptr;
+Trapecio* trape=nullptr;
+bool Target_free=false;
+float dt=0.0f,lastX=0.0f,lastY=0.0f;
+
+Camera_Status camMode = TARGETING;
+int currentSceneIndex = 5;
+
+//------------- SECCION DE TESTS ---------------//
+void tests_anim(){
+
+	// CUIDADO CON DOBLE RELEASE
+	// TEST CAMARA
+	Animation_Step* moveRobot = new Animation_Step(robot, 4.0f, 'a', 10.0f, 'x', 'W');
+
+	// rotar la cámara 90 grados en yaw en 4 segundos
+	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
+	Animation_Step* rotateCam1 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
+
+	// rotar la cámara 90 grados en yaw en 4 segundos
+	Animation_Step* rotateCam2 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'x', 'W');
+
+	//Pequeño movimiento para ver Z
+	Animation_Step* movCam1= new Animation_Step(cam,4.0f,'a',1.0f,'x','W');
+	Animation_Step* rotateCam3 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'z', 'W');
+
+	// zoom suave
+	Animation_Step* zoomCam = new Animation_Step(cam, 4.0f, 'g', -40.0f, 'z', 'W');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{moveRobot,rotateCam1}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{movCam1,rotateCam3}, 'S');
+}
+
+void tests_triple(){
+
+	// CUIDADO CON DOBLE RELEASE
+	// TEST Piramid
+	Animation_Step* movePiramid = new Animation_Step(piramid, 4.0f, 'a', 5.0f, 'x', 'W');
+	Animation_Step* movePiramid2 = new Animation_Step(piramid, 4.0f, 'a', 5.0f, 'y', 'W');
+	Animation_Step* movePiramid3 = new Animation_Step(piramid, 4.0f, 'a', -5.0f, 'z', 'W');
+
+	// Test Cubo
+	Animation_Step* rotateCube = new Animation_Step(cube, 4.0f, 'd', 90.0f, 'y', 'W');
+	Animation_Step* rotateCube1 = new Animation_Step(cube, 4.0f, 'd', 90.0f, 'x', 'W');
+	Animation_Step* rotateCube2 = new Animation_Step(cube, 4.0f, 'd', 90.0f, 'z', 'W');
+
+	// Test Esfera
+	Animation_Step* scale1 = new Animation_Step(sphere, 12.0f, 'g', 1.5f, 'x', 'W');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{movePiramid,rotateCube,scale1,movePiramid2,rotateCube1,movePiramid3,rotateCube2}, 'S');
+}
+
+void alinear(){
+	// Test Cubo
+	Animation_Step* mov1 = new Animation_Step(trape, 0.1f, 'a', 1.5f, 'x', 'W');
+
+	// Test Esfera
+	Animation_Step* mov2 = new Animation_Step(pizza, 0.1f, 'a', -1.5f, 'x', 'W');
+	
+	Animation_Step* mov3 = new Animation_Step(piramid, 0.1f, 'd', -90.0f, 'z', 'W');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3}, 'N');
+	
+};
+
+void orbit(){
+
+
+	// rotar la cámara 90 grados en yaw en 4 segundos
+	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
+	Animation_Step* rotateCam1 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam1}, 'S');
+}
+
+void rotate_piramid(){
+
+
+	// rotar la cámara 90 grados en yaw en 4 segundos
+	Animation_Step* rotateCam = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'x', 'L');
+	Animation_Step* rotateCam1 = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'y', 'L');
+	Animation_Step* rotateCam2 = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'z', 'L');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam1}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
+}
+
+void mov_trap(){
+
+
+	Animation_Step* mov1 = new Animation_Step(trape, 5.0f, 'a', 1.0f, 'x', 'W');
+	Animation_Step* mov2 = new Animation_Step(trape, 5.0f, 'a', 1.0f, 'y', 'W');
+	Animation_Step* mov3 = new Animation_Step(trape, 5.0f, 'a', -1.0f, 'x', 'W');
+	Animation_Step* mov4 = new Animation_Step(trape, 5.0f, 'a', -1.0f, 'y', 'W');
+
+
+	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3,mov4}, 'S');
+}
+
+void mov_trap_2(){
+
+	Animation_Step* mov1 = new Animation_Step(pizza, 5.0f, 'a', 1.0f, 'x', 'W');
+	Animation_Step* mov2 = new Animation_Step(pizza, 5.0f, 'a', 1.0f, 'y', 'W');
+	Animation_Step* mov3 = new Animation_Step(pizza, 5.0f, 'a', -1.0f, 'x', 'W');
+	Animation_Step* mov4 = new Animation_Step(pizza, 5.0f, 'a', -1.0f, 'y', 'W');
+
+
+	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3,mov4}, 'S');
+}
+
+
+//------------ FIN TESTS xd -------------------//
+
+
+
+void general_Menu(){
+	std::cout << "===================================" << std::endl;
+    std::cout << "|        Bienvenido a             |" << std::endl;
+    std::cout << "|     Simulador de Camara         |" << std::endl;
+    std::cout << "|                                 |" << std::endl;
+    std::cout << "|  1. Empezar animacion (Solo robot)|" << std::endl;
+	std::cout << "|  2. Empezar test camara         |" << std::endl;
+	std::cout << "|  xyz. Rotar ejes                |" << std::endl;
+    std::cout << "|  P. Rotar obj (Respecto mundo)  |" << std::endl;
+	std::cout << "|  B. Cambiar modo camara         |" << std::endl;
+	std::cout << "|  E. Cambiar modo hijo escena activa|" << std::endl;
+	std::cout << "|  Flechas. Mover objeto activo   |" << std::endl;
+	std::cout << "|  J. Camara izquierda            |" << std::endl;
+	std::cout << "|  I. Camara adelante             |" << std::endl;
+	std::cout << "|  K. Camara atras                |" << std::endl;
+	std::cout << "|  L. Camara derecha              |" << std::endl;
+    std::cout << "|  ESC/CTRL+C. Salir              |" << std::endl;
+    std::cout << "===================================" << std::endl;
+}
+
+void framebuffer_size_callback(GLFWwindow* window,int width,int height){
+	glViewport(0,0,width,height);
+}
+void set_Vs(){
+	glGenVertexArrays(1,&VAO);
+	glGenBuffers(1,&VBO);
+	glGenBuffers(1,&EBO);
+	
+	glBindVertexArray(VAO);
+	
+	glBindBuffer(GL_ARRAY_BUFFER,VBO);
+	glBufferData(GL_ARRAY_BUFFER,mundito->all_vertices.size()*sizeof(float),mundito->all_vertices.data(),GL_DYNAMIC_DRAW);
+
+	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3*sizeof(float),(void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,mundito->all_EBOs.size()*sizeof(unsigned int),mundito->all_EBOs.data(),GL_DYNAMIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	
+	glBindVertexArray(0);
+	
+}
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+
+	static bool firstMouse = true;
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+        return;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+
+    lastX = xpos;
+    lastY = ypos;
+
+    if (camMode == FREE) {
+        cam->ProcessMouse(xoffset, yoffset);
+    }
+}
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+    cam->ProcessScroll((float)yoffset);
+}
+
+void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
+	if(action != GLFW_PRESS){
+		return;
+	}
+	
+	switch(key){
+		case GLFW_KEY_ESCAPE:{
+			std::cout << "ESC presionado saliendo..." << std::endl;
+			glfwSetWindowShouldClose(window,GLFW_TRUE);
+			break;
+		}
+		
+		case GLFW_KEY_C:{
+			if(mods & GLFW_MOD_CONTROL){
+				std::cout << "CTRL+C presionado saliendo..." << std::endl;
+				glfwSetWindowShouldClose(window,GLFW_TRUE);
+			}
+			break;
+		}
+		case GLFW_KEY_1:{
+			if(mundito->activeSceneNode->name == "Robot"){
+				robot->Walk(anim);
+			}else{
+				std::cout << "No es robot no se puede caminar" << std::endl;
+			}
+			
+			break;
+		}
+		case GLFW_KEY_2:{
+			std::cout << "Realizando test camara :D " << std::endl;
+			tests_anim();
+			break;
+		}
+		case GLFW_KEY_3:{
+			std::cout << "Realizando test triples :D " << std::endl;
+			tests_triple();
+			break;
+		}
+		case GLFW_KEY_X:{
+			CURRENT_AXIS='x';
+			std::cout << "Eje actual:X" << std::endl;
+			break;
+		}
+		case GLFW_KEY_Y:{
+			CURRENT_AXIS='y';
+			std::cout << "Eje actual:Y" << std::endl;
+			break;
+		}
+		case GLFW_KEY_Z:{
+			CURRENT_AXIS='z';
+			std::cout << "Eje actual: Z" << std::endl;
+			break;
+		}
+		case GLFW_KEY_J:{
+			cam->ProcessKeyboard(LEFT, dt);
+			break;
+		}
+		case GLFW_KEY_I:{
+			cam->ProcessKeyboard(FORWARD, dt);
+			break;
+		}
+		case GLFW_KEY_K:{
+			cam->ProcessKeyboard(BACKWARD, dt);
+			break;
+		}
+		case GLFW_KEY_L:{
+			cam->ProcessKeyboard(RIGHT, dt);
+			break;
+		}
+		case GLFW_KEY_P:{
+			currentSceneIndex =(currentSceneIndex+1)%mundito->root->children.size();
+			mundito->activeSceneNode=mundito->root->children[currentSceneIndex];
+			std::cout << "Escena actual: "<< mundito->activeSceneNode->name << " con index " << currentSceneIndex << std::endl;
+			break;
+		}
+		case GLFW_KEY_E:{
+            mundito->activeSceneNode->SelectNextChild();
+            break;
+        }
+		case GLFW_KEY_B: {
+			if (camMode == FREE){
+				std::cout << "Cambiando a modo TARGETING " << std::endl;
+				camMode = TARGETING;
+				cam->UpdateCam(TARGETING,mundito->activeSceneNode->GetWorldPosition());
+			}
+			else{
+				std::cout << "Cambiando a modo FREE " << std::endl;
+				camMode = FREE;
+				cam->UpdateCam(FREE);
+			}
+			break;
+		}
+		
+		case GLFW_KEY_O:{
+			Target_free=true;
+			robot->Move(anim);
+			break;
+		}
+		default:{
+			break;
+		}
+	}
+	if(mundito && mundito->activeSceneNode){
+		mundito->activeSceneNode->handleKey(key,mods,CURRENT_AXIS);
+	}
+	
+}
+
+
+int main(){
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+	
+	GLFWwindow* window=glfwCreateWindow(800,800,"Animación robot",NULL,NULL);
+	if(!window){
+		std::cout << "Windows didn't charge" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(0);
+	if(!gladLoadGL(glfwGetProcAddress)){
+		std::cout << "GLAD failed :( " << std::endl;
+		return -1;
+	}
+	
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
+	glfwSetKeyCallback(window,key_callback);
+	glfwSetFramebufferSizeCallback(window,framebuffer_size_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	
+	mundito = new World();
+	cam = Builder::BuildCamera();
+	anim = Builder::BuildAnimator();
+	
+	std::cout << "CONSTRUYENDO PIZZA " << std::endl;
+	pizza = Builder::BuildPizzaScene(mundito,NUM_REBANADAS); // Pizza izq
+	trape=Builder::BuildTrapecio(mundito); // Trapecio derecha
+	piramid = Builder::BuildPyramidScene(mundito,0.5f); // Piramedio medio
+	//cube = Builder::BuildCubeScene(mundito,{0.0f,0.0f,0.0f});
+	//sphere=Builder::BuildSphereScene(mundito,0.5f);
+	//tower = Builder::BuildTowerScene(mundito);
+	//robot = Builder::BuildRobotScene(mundito);
+	
+	// Ojo aca cambiar escena inicial :D
+	mundito->activeSceneNode= piramid;
+
+	mundito->activeSceneNode->printMenu();
+	general_Menu();
+	
+	alinear();
+	orbit();
+	rotate_piramid();
+	mov_trap_2();
+	mov_trap();
+	set_Vs();
+	//mundito->print(mundito->root);
+	//glEnable(GL_DEPTH_TEST);
+	
+
+	float lastTime=glfwGetTime();
+	double fpsTime = 0.0;
+	int fpsFrames = 0;
+	while(!glfwWindowShouldClose(window)){
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		float NowTime=glfwGetTime();
+		dt=NowTime-lastTime;
+		lastTime=NowTime;
+		
+		fpsTime += dt;
+		fpsFrames++;
+
+		if (fpsTime >= 1.0) {
+			double fps = fpsFrames / fpsTime;
+
+			std::string title = "Robot OpenGL - FPS: " + std::to_string((int)fps);
+			glfwSetWindowTitle(window, title.c_str());
+
+			fpsFrames = 0;
+			fpsTime = 0.0;
+		}
+		
+		glBindVertexArray(VAO);
+		glPointSize(4.0f);
+		glLineWidth(4.0f);
+		
+		
+		glfwPollEvents();
+		anim->Execute_animations(dt);
+		
+		// Para seguir
+		if (camMode == TARGETING) {
+			cam->UpdateCam(TARGETING, mundito->activeSceneNode->GetWorldPosition());
+		}
+		else {
+			cam->UpdateCam(FREE);
+		}
+        mundito->DrawShape(cam->GetLookAt(),cam->GetProjection(800.0f, 800.0f, 0.1f, 100.0f));
+		
+		glBindVertexArray(0);
+		
+        glfwSwapBuffers(window);
+        
+    }
+	delete mundito;
+	return 0;
+}
