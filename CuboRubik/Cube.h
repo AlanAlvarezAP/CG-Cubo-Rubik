@@ -23,8 +23,9 @@ public:
 	std::vector<RGB> triColors;
 	std::vector<RGB> lineColors;
 	std::vector<RGB> pointColors;
+	int type;
 public:
-	Cube(World* world, const Point& cent);
+	Cube(World* world, const Point& cent,int tp=0);
 	void Generate() override;
 	void DrawGeometry(const Matrix& parent) override {}
 	void printMenu() override;

@@ -80,7 +80,7 @@ void Face::DrawGeometry(const Matrix& parent) {
     }
 }
 
-Cube::Cube(World* world, const Point& cent):ShapeNode(world, 0, "Cube"), center(cent),sector_Start(0), lines_Start(0), points_Start(0) {}
+Cube::Cube(World* world, const Point& cent,int tp):ShapeNode(world, 0, "Cube"), center(cent),sector_Start(0), lines_Start(0), points_Start(0),type(tp) {}
 
 void Cube::Generate() {
 
