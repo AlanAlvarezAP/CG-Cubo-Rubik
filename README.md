@@ -6,7 +6,7 @@ Repositorio para el primer proyecto grupal del curso de Computación Grafica Cco
    - Jean Marc Nadeau
    - Luigi Valenzuela
 
-**Profesor:** Manuel Loaiza Fernandez
+**Profesor:** Manuel Loaiza Fernandez  
 **Semestre:** 2026-1  
 **Grupo:** CCOMP7-1  
 
