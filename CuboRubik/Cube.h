@@ -25,7 +25,7 @@ public:
 	std::vector<RGB> pointColors;
 	int type;
 public:
-	Cube(World* world, const Point& cent,int tp=0);
+	Cube(World* world, const Point& cent,int tp=0,std::string name="Cube");
 	void Generate() override;
 	void DrawGeometry(const Matrix& parent) override {}
 	void printMenu() override;

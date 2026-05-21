@@ -37,6 +37,7 @@ Robot* robot=nullptr;
 Camera* cam=nullptr;
 Animator* anim=nullptr;
 Trapecio* trape=nullptr;
+Rubik* rubik=nullptr;
 bool Target_free=false;
 float dt=0.0f,lastX=0.0f,lastY=0.0f;
 
@@ -68,6 +69,17 @@ void tests_anim(){
 	anim->Add_Animations(std::vector<Animation_Step*>{moveRobot,rotateCam1}, 'S');
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
 	anim->Add_Animations(std::vector<Animation_Step*>{movCam1,rotateCam3}, 'S');
+}
+
+void tests_rubik(){
+
+	// CUIDADO CON DOBLE RELEASE
+	// TEST CAMARA
+
+	// rotar la cámara 90 grados en yaw en 4 segundos
+	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
 }
 
 void tests_triple(){
@@ -363,28 +375,26 @@ int main(){
 	cam = Builder::BuildCamera();
 	anim = Builder::BuildAnimator();
 	
-	std::cout << "CONSTRUYENDO PIZZA " << std::endl;
-	pizza = Builder::BuildPizzaScene(mundito,NUM_REBANADAS); // Pizza izq
-	trape=Builder::BuildTrapecio(mundito); // Trapecio derecha
-	piramid = Builder::BuildPyramidScene(mundito,0.5f); // Piramedio medio
+	std::cout << "CONSTRUYENDO RUBIK " << std::endl;
+	//pizza = Builder::BuildPizzaScene(mundito,NUM_REBANADAS); // Pizza izq
+	//trape=Builder::BuildTrapecio(mundito); // Trapecio derecha
+	//piramid = Builder::BuildPyramidScene(mundito,0.5f); // Piramedio medio
 	//cube = Builder::BuildCubeScene(mundito,{0.0f,0.0f,0.0f});
 	//sphere=Builder::BuildSphereScene(mundito,0.5f);
 	//tower = Builder::BuildTowerScene(mundito);
 	//robot = Builder::BuildRobotScene(mundito);
+	rubik=Builder::BuildRubik(mundito);
 	
 	// Ojo aca cambiar escena inicial :D
-	mundito->activeSceneNode= piramid;
+	mundito->activeSceneNode= rubik;
 
 	mundito->activeSceneNode->printMenu();
 	general_Menu();
 	
-	alinear();
-	orbit();
-	//rotate_piramid();
-	mov_trap_2();
-	mov_trap();
+	tests_rubik();
+
 	set_Vs();
-	//mundito->print(mundito->root);
+	mundito->print(mundito->root);
 	glEnable(GL_DEPTH_TEST);
 	
 
@@ -414,7 +424,7 @@ int main(){
 		
 		glBindVertexArray(VAO);
 		glPointSize(4.0f);
-		glLineWidth(4.0f);
+		glLineWidth(10.0f);
 		
 		
 		glfwPollEvents();

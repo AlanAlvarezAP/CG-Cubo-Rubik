@@ -2,6 +2,9 @@
 
 #include "Shape.h"
 
+enum Orientation{HORIZONTAL,VERTICAL};
+enum Types{ESQUINA,MEDIO_CENTRO,CENTRO};
+
 class Camada : public ShapeNode {
 public:
 	bool Horizontal_vert;

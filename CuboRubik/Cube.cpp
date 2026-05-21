@@ -66,7 +66,7 @@ void Face::DrawGeometry(const Matrix& parent) {
     }
 
     for(int i = lines_Start, l = 0; i < points_Start; i += 2, l++) {
-        RGB c = lineColors[l % lineColors.size()];
+        RGB c = ColorTable[NEGRO];
         Shader.SetColor(c.r, c.g, c.b);
 
         glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
@@ -80,7 +80,7 @@ void Face::DrawGeometry(const Matrix& parent) {
     }
 }
 
-Cube::Cube(World* world, const Point& cent,int tp):ShapeNode(world, 0, "Cube"), center(cent),sector_Start(0), lines_Start(0), points_Start(0),type(tp) {}
+Cube::Cube(World* world, const Point& cent,int tp,std::string name):ShapeNode(world, 0, name), center(cent),sector_Start(0), lines_Start(0), points_Start(0),type(tp) {}
 
 void Cube::Generate() {
 

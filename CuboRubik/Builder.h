@@ -9,6 +9,7 @@
 #include "Robot.h"
 #include "Camera.h"
 #include "Trapecio.h"
+#include "Rubik.h"
 
 class Builder{
 public:
@@ -114,5 +115,13 @@ public:
 		trape->Generate();
 		std::cout << "GEN Trapecio" << std::endl;
 		return trape;
+	}
+	
+	static Rubik* BuildRubik(World* &mundito){
+		Rubik* cubo_rubik=new Rubik(mundito,{0.0f,0.0f,0.0f});
+		mundito->root->AddChildren(cubo_rubik);
+		cubo_rubik->Generate();
+		std::cout << "GEN Cubo Rubik" << std::endl;
+		return cubo_rubik;
 	}
 };
