@@ -35,11 +35,11 @@ void Face::Generate() {
     int &idx = world->globalColorCounter;
     const int COLOR_COUNT = ARENA + 1;
 
-    //triColors.clear(); // elimina el envio del vector
+    //triColors.clear();
     lineColors.clear();
     pointColors.clear();
 
-	if(triColors.empty()) {
+    if(triColors.empty()) {
 		triColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
 		triColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
 	}
@@ -52,7 +52,7 @@ void Face::Generate() {
     pointColors.push_back(ColorTable[9]);
     pointColors.push_back(ColorTable[9]);
     pointColors.push_back(ColorTable[9]);
-    pointColors.push_back(ColorTable[9]);
+    pointColors.push_back(ColorTable[9]);	
 }
 
 void Face::DrawGeometry(const Matrix& parent) {
@@ -74,14 +74,12 @@ void Face::DrawGeometry(const Matrix& parent) {
         glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
 
-	
     for(int i = points_Start, p = 0; i < EBOs_range.size(); i += 1, p++) {
         RGB c = pointColors[p % pointColors.size()];
         Shader.SetColor(c.r, c.g, c.b);
 
         glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
-	
 }
 
 Cube::Cube(World* world, const Point& cent, std::vector<RGB> colors, int tp, std::string name) :

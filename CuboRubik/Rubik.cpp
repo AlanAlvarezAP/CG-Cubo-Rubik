@@ -25,6 +25,7 @@ Rubik::Rubik(World* world,const Point &center):ShapeNode(world,GL_TRIANGLES,"Cub
 void Rubik::Generate() {
 	std::vector<Cube*> cubos;
 	std::vector<int> types={ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,CENTRO,CENTRO,CENTRO};
+	
 	std::vector<std::vector<RGB>> rubikColors = { // orden de facesIdx en Generate
 		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 1
 		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 2
@@ -104,66 +105,72 @@ void Rubik::Generate() {
 	cubos[24]->Mat.UpdateView('a',0.4,0.0,-0.4,'x','W');
 	cubos[25]->Mat.UpdateView('a',-0.4,0.0,-0.4,'x','W');
 	cubos[26]->Mat.UpdateView('a',0.0,0.0,-0.4,'x','W'); // DUMMY
-	// Camada CH1
 	
+	// Camada CH1
 	camada_verts[0]->AddChildren(cubos[0]);
-	camada_verts[0]->AddChildren(cubos[1]);
-	camada_verts[0]->AddChildren(cubos[2]);
-	camada_verts[0]->AddChildren(cubos[3]);
-	camada_verts[0]->AddChildren(cubos[4]);
-	camada_verts[0]->AddChildren(cubos[5]);
-	camada_verts[0]->AddChildren(cubos[6]);
+	camada_verts[0]->AddChildren(cubos[8]);
+	camada_verts[0]->AddChildren(cubos[16]);
+	camada_verts[0]->AddChildren(cubos[23]);
+	camada_verts[0]->AddChildren(cubos[15]);
 	camada_verts[0]->AddChildren(cubos[7]);
+	camada_verts[0]->AddChildren(cubos[22]);
+	camada_verts[0]->AddChildren(cubos[14]);
+	camada_verts[0]->AddChildren(cubos[6]);
 
 	// Camada CH2
+	camada_verts[1]->AddChildren(cubos[1]);
 	camada_verts[1]->AddChildren(cubos[9]);
-	camada_verts[1]->AddChildren(cubos[10]);
-	camada_verts[1]->AddChildren(cubos[11]);
-	camada_verts[1]->AddChildren(cubos[12]);
+	camada_verts[1]->AddChildren(cubos[17]);
+	camada_verts[1]->AddChildren(cubos[24]);
+	camada_verts[1]->AddChildren(cubos[26]);
+	camada_verts[1]->AddChildren(cubos[25]);
+	camada_verts[1]->AddChildren(cubos[21]);
 	camada_verts[1]->AddChildren(cubos[13]);
-	camada_verts[1]->AddChildren(cubos[14]);
-	camada_verts[1]->AddChildren(cubos[15]);
-	camada_verts[1]->AddChildren(cubos[16]);
+	camada_verts[1]->AddChildren(cubos[5]);
 	
 	// Camada CH3
-	camada_verts[2]->AddChildren(cubos[17]);
+	camada_verts[2]->AddChildren(cubos[2]);
+	camada_verts[2]->AddChildren(cubos[10]);
 	camada_verts[2]->AddChildren(cubos[18]);
 	camada_verts[2]->AddChildren(cubos[19]);
+	camada_verts[2]->AddChildren(cubos[11]);
+	camada_verts[2]->AddChildren(cubos[3]);
 	camada_verts[2]->AddChildren(cubos[20]);
-	camada_verts[2]->AddChildren(cubos[21]);
-	camada_verts[2]->AddChildren(cubos[22]);
-	camada_verts[2]->AddChildren(cubos[23]);
-	camada_verts[2]->AddChildren(cubos[24]);
+	camada_verts[2]->AddChildren(cubos[12]);
+	camada_verts[2]->AddChildren(cubos[4]);
 	
 	// Camada CV1
+	camada_horits[0]->AddChildren(cubos[0]);
 	camada_horits[0]->AddChildren(cubos[1]);
 	camada_horits[0]->AddChildren(cubos[2]);
+	camada_horits[0]->AddChildren(cubos[7]);
+	camada_horits[0]->AddChildren(cubos[25]);
 	camada_horits[0]->AddChildren(cubos[3]);
-	camada_horits[0]->AddChildren(cubos[9]);
-	camada_horits[0]->AddChildren(cubos[11]);
-	camada_horits[0]->AddChildren(cubos[17]);
-	camada_horits[0]->AddChildren(cubos[18]);
-	camada_horits[0]->AddChildren(cubos[19]);
+	camada_horits[0]->AddChildren(cubos[6]);
+	camada_horits[0]->AddChildren(cubos[5]);
+	camada_horits[0]->AddChildren(cubos[4]);
 	
 	// Camada CV2
-	camada_horits[1]->AddChildren(cubos[4]);
 	camada_horits[1]->AddChildren(cubos[8]);
-	camada_horits[1]->AddChildren(cubos[12]);
-	camada_horits[1]->AddChildren(cubos[16]);
-	camada_horits[1]->AddChildren(cubos[20]);
-	camada_horits[1]->AddChildren(cubos[24]);
-	camada_horits[1]->AddChildren(cubos[25]);
+	camada_horits[1]->AddChildren(cubos[9]);
+	camada_horits[1]->AddChildren(cubos[10]);
+	camada_horits[1]->AddChildren(cubos[15]);
 	camada_horits[1]->AddChildren(cubos[26]);
+	camada_horits[1]->AddChildren(cubos[11]);
+	camada_horits[1]->AddChildren(cubos[14]);
+	camada_horits[1]->AddChildren(cubos[13]);
+	camada_horits[1]->AddChildren(cubos[12]);
 	
 	// Camada CV3
-	camada_horits[2]->AddChildren(cubos[5]);
-	camada_horits[2]->AddChildren(cubos[6]);
-	camada_horits[2]->AddChildren(cubos[7]);
-	camada_horits[2]->AddChildren(cubos[13]);
-	camada_horits[2]->AddChildren(cubos[15]);
-	camada_horits[2]->AddChildren(cubos[21]);
-	camada_horits[2]->AddChildren(cubos[22]);
+	camada_horits[2]->AddChildren(cubos[16]);
+	camada_horits[2]->AddChildren(cubos[17]);
+	camada_horits[2]->AddChildren(cubos[18]);
 	camada_horits[2]->AddChildren(cubos[23]);
+	camada_horits[2]->AddChildren(cubos[24]);
+	camada_horits[2]->AddChildren(cubos[19]);
+	camada_horits[2]->AddChildren(cubos[22]);
+	camada_horits[2]->AddChildren(cubos[21]);
+	camada_horits[2]->AddChildren(cubos[20]);
 	
 }
 

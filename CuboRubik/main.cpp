@@ -49,7 +49,7 @@ void tests_anim(){
 
 	// CUIDADO CON DOBLE RELEASE
 	// TEST CAMARA
-	Animation_Step* moveRobot = new Animation_Step(robot, 4.0f, 'a', 10.0f, 'x', 'W');
+	//Animation_Step* moveRobot = new Animation_Step(robot, 4.0f, 'a', 10.0f, 'x', 'W');
 
 	// rotar la cámara 90 grados en yaw en 4 segundos
 	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
@@ -66,7 +66,7 @@ void tests_anim(){
 	Animation_Step* zoomCam = new Animation_Step(cam, 4.0f, 'g', -40.0f, 'z', 'W');
 
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
-	anim->Add_Animations(std::vector<Animation_Step*>{moveRobot,rotateCam1}, 'S');
+	//anim->Add_Animations(std::vector<Animation_Step*>{moveRobot,rotateCam1}, 'S');
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
 	anim->Add_Animations(std::vector<Animation_Step*>{movCam1,rotateCam3}, 'S');
 }
@@ -78,8 +78,10 @@ void tests_rubik(){
 
 	// rotar la cámara 90 grados en yaw en 4 segundos
 	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
+	Animation_Step* rotateCam2 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'x', 'W');
 
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
 }
 
 void tests_triple(){
