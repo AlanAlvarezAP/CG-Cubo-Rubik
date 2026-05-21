@@ -14,7 +14,7 @@ Repositorio para el primer proyecto grupal del curso de Computación Grafica Cco
 * Modelamiento
    - [x] Generar Estructura Cubo Rubik
    - [x] Añadir a Scene Graph logica de camadas y cubos
-   - [ ] Coloreo
+   - [x] Coloreo
  
 * Animación
    - [ ] Generar Algoritmo de movimiento de camadas
