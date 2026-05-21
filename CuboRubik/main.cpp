@@ -266,7 +266,7 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 		}
 		case GLFW_KEY_2:{
 			std::cout << "Realizando test camara :D " << std::endl;
-			tests_anim();
+			tests_rubik();
 			break;
 		}
 		case GLFW_KEY_3:{
@@ -426,7 +426,7 @@ int main(){
 		
 		glBindVertexArray(VAO);
 		glPointSize(4.0f);
-		glLineWidth(10.0f);
+		glLineWidth(4.0f);
 		
 		
 		glfwPollEvents();
