@@ -75,36 +75,36 @@ void Rubik::Generate() {
 
 	// Añadiendo todos los cubos
 	// Actualizando pos
-	cubos[0]->Mat.UpdateView('a',-0.4,-0.4,0.0,'x','W');
-	cubos[1]->Mat.UpdateView('a',-0.4,0.0,0.0,'x','W');
-	cubos[2]->Mat.UpdateView('a',-0.4,0.4,0.0,'x','W');
-	cubos[3]->Mat.UpdateView('a',-0.4,0.4,-0.4,'x','W');
-	cubos[4]->Mat.UpdateView('a',-0.4,0.4,-0.8,'x','W');
-	cubos[5]->Mat.UpdateView('a',-0.4,0.0,-0.8,'x','W');
-	cubos[6]->Mat.UpdateView('a',-0.4,-0.4,-0.8,'x','W');
-	cubos[7]->Mat.UpdateView('a',-0.4,-0.4,-0.4,'x','W');
+	cubos[0]->Mat.UpdateView('a',-0.42,-0.42,0.0,'x','W');
+	cubos[1]->Mat.UpdateView('a',-0.42,0.0,0.0,'x','W');
+	cubos[2]->Mat.UpdateView('a',-0.42,0.42,0.0,'x','W');
+	cubos[3]->Mat.UpdateView('a',-0.42,0.42,-0.42,'x','W');
+	cubos[4]->Mat.UpdateView('a',-0.42,0.42,-0.86,'x','W');
+	cubos[5]->Mat.UpdateView('a',-0.42,0.0,-0.86,'x','W');
+	cubos[6]->Mat.UpdateView('a',-0.42,-0.42,-0.86,'x','W');
+	cubos[7]->Mat.UpdateView('a',-0.42,-0.42,-0.42,'x','W');
 
-	cubos[8]->Mat.UpdateView('a',0.0,-0.4,0.0,'x','W');
+	cubos[8]->Mat.UpdateView('a',0.0,-0.42,0.0,'x','W');
 	cubos[9]->Mat.UpdateView('a',0.0,0.0,0.0,'x','W');
-	cubos[10]->Mat.UpdateView('a',0.0,0.4,0.0,'x','W');
-	cubos[11]->Mat.UpdateView('a',0.0,0.4,-0.4,'x','W');
-	cubos[12]->Mat.UpdateView('a',0.0,0.4,-0.8,'x','W');
-	cubos[13]->Mat.UpdateView('a',0.0,0.0,-0.8,'x','W');
-	cubos[14]->Mat.UpdateView('a',0.0,-0.4,-0.8,'x','W');
-	cubos[15]->Mat.UpdateView('a',0.0,-0.4,-0.4,'x','W');
+	cubos[10]->Mat.UpdateView('a',0.0,0.42,0.0,'x','W');
+	cubos[11]->Mat.UpdateView('a',0.0,0.42,-0.42,'x','W');
+	cubos[12]->Mat.UpdateView('a',0.0,0.42,-0.86,'x','W');
+	cubos[13]->Mat.UpdateView('a',0.0,0.0,-0.86,'x','W');
+	cubos[14]->Mat.UpdateView('a',0.0,-0.42,-0.86,'x','W');
+	cubos[15]->Mat.UpdateView('a',0.0,-0.42,-0.42,'x','W');
 
-	cubos[16]->Mat.UpdateView('a',0.4,-0.4,0.0,'x','W');
-	cubos[17]->Mat.UpdateView('a',0.4,0.0,0.0,'x','W');
-	cubos[18]->Mat.UpdateView('a',0.4,0.4,0.0,'x','W');
-	cubos[19]->Mat.UpdateView('a',0.4,0.4,-0.4,'x','W');
-	cubos[20]->Mat.UpdateView('a',0.4,0.4,-0.8,'x','W');
-	cubos[21]->Mat.UpdateView('a',0.4,0.0,-0.8,'x','W');
-	cubos[22]->Mat.UpdateView('a',0.4,-0.4,-0.8,'x','W');
-	cubos[23]->Mat.UpdateView('a',0.4,-0.4,-0.4,'x','W');
+	cubos[16]->Mat.UpdateView('a',0.42,-0.42,0.0,'x','W');
+	cubos[17]->Mat.UpdateView('a',0.42,0.0,0.0,'x','W');
+	cubos[18]->Mat.UpdateView('a',0.42,0.42,0.0,'x','W');
+	cubos[19]->Mat.UpdateView('a',0.42,0.42,-0.42,'x','W');
+	cubos[20]->Mat.UpdateView('a',0.42,0.42,-0.86,'x','W');
+	cubos[21]->Mat.UpdateView('a',0.42,0.0,-0.86,'x','W');
+	cubos[22]->Mat.UpdateView('a',0.42,-0.42,-0.86,'x','W');
+	cubos[23]->Mat.UpdateView('a',0.42,-0.42,-0.42,'x','W');
 
-	cubos[24]->Mat.UpdateView('a',0.4,0.0,-0.4,'x','W');
-	cubos[25]->Mat.UpdateView('a',-0.4,0.0,-0.4,'x','W');
-	cubos[26]->Mat.UpdateView('a',0.0,0.0,-0.4,'x','W'); // DUMMY
+	cubos[24]->Mat.UpdateView('a',0.42,0.0,-0.42,'x','W');
+	cubos[25]->Mat.UpdateView('a',-0.42,0.0,-0.42,'x','W');
+	cubos[26]->Mat.UpdateView('a',0.0,0.0,-0.42,'x','W'); // DUMMY
 	
 	// Camada CH1
 	camada_verts[0]->AddChildren(cubos[0]);

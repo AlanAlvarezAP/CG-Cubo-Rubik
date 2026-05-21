@@ -16,19 +16,18 @@ void Face::Generate() {
     std::vector<unsigned int> pointIdx;
 
     unsigned int base = world->all_vertices.size() / 3;
-
     vertices.insert(vertices.end(), {a.x, a.y, a.z,b.x, b.y, b.z,c.x, c.y, c.z,d.x, d.y, d.z});
     indices = {base, base+1, base+2,base, base+2, base+3};
     lineIdx = {base, base+1,base+1, base+2,base+2, base+3,base+3, base};
-    pointIdx = {base, base+1, base+2, base+3};
+    //pointIdx = {base, base+1, base+2, base+3};
 
     sector_Start = 0;
     lines_Start = indices.size();
-    points_Start = lines_Start + lineIdx.size();
+    //points_Start = lines_Start + lineIdx.size();
 
     indices.insert(indices.end(), lineIdx.begin(), lineIdx.end());
-    indices.insert(indices.end(), pointIdx.begin(), pointIdx.end());
-
+    //indices.insert(indices.end(), pointIdx.begin(), pointIdx.end());
+	
     EBOs_range = world->Add_Batch(vertices, indices, offset);
     IsDrawable = true;
 
@@ -49,10 +48,10 @@ void Face::Generate() {
     lineColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
     lineColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
 
+    /*pointColors.push_back(ColorTable[9]);
     pointColors.push_back(ColorTable[9]);
     pointColors.push_back(ColorTable[9]);
-    pointColors.push_back(ColorTable[9]);
-    pointColors.push_back(ColorTable[9]);	
+    pointColors.push_back(ColorTable[9]);*/	
 }
 
 void Face::DrawGeometry(const Matrix& parent) {
@@ -67,19 +66,20 @@ void Face::DrawGeometry(const Matrix& parent) {
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
 
-    for(int i = lines_Start, l = 0; i < points_Start; i += 2, l++) {
+	// Cambio de i< lines_Start a i < EBOs_range
+    for(int i = lines_Start, l = 0; i < EBOs_range.size(); i += 2, l++) {
         RGB c = ColorTable[NEGRO];
         Shader.SetColor(c.r, c.g, c.b);
 
         glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
 
-    for(int i = points_Start, p = 0; i < EBOs_range.size(); i += 1, p++) {
+    /*for(int i = points_Start, p = 0; i < EBOs_range.size(); i += 1, p++) {
         RGB c = pointColors[p % pointColors.size()];
         Shader.SetColor(c.r, c.g, c.b);
 
         glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
-    }
+    }*/
 }
 
 Cube::Cube(World* world, const Point& cent, std::vector<RGB> colors, int tp, std::string name) :
@@ -101,7 +101,7 @@ void Cube::Generate() {
     v[6] = {center.x + s, center.y + s, center.z + s};
     v[7] = {center.x - s, center.y + s, center.z + s};
 
-    int facesIdx[6][4] = {{0,1,2,3},{4,5,6,7},{0,1,5,4},{2,3,7,6},{0,3,7,4},{1,2,6,5}};
+    int facesIdx[6][4] = {{0,1,2,3},{4,7,6,5},{0,4,5,1},{3,2,6,7},{0,3,7,4},{1,5,6,2}};
 
     for(int i = 0; i < 6; i++) {
         Face* f = new Face(world,v[facesIdx[i][0]],v[facesIdx[i][1]],v[facesIdx[i][2]],v[facesIdx[i][3]]);

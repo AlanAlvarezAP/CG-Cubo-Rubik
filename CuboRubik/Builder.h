@@ -60,7 +60,7 @@ public:
 	
 	static Cube* BuildCubeScene(World* &mundito, const Point& center = {0.0f, 0.0f, 0.0f}) {
 
-        Cube* cube = new Cube(mundito, center);
+        Cube* cube = new Cube(mundito, center,{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]});
         mundito->root->AddChildren(cube);
         cube->Generate();
 
