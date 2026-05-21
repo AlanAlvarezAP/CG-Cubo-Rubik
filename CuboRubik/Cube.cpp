@@ -35,22 +35,24 @@ void Face::Generate() {
     int &idx = world->globalColorCounter;
     const int COLOR_COUNT = ARENA + 1;
 
-    triColors.clear();
+    //triColors.clear(); // elimina el envio del vector
     lineColors.clear();
     pointColors.clear();
 
-    triColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
-    triColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
+	if(triColors.empty()) {
+		triColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
+		triColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
+	}
 
     lineColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
     lineColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
     lineColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
     lineColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
 
-    pointColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
-    pointColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
-    pointColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
-    pointColors.push_back(ColorTable[idx++ % COLOR_COUNT]);
+    pointColors.push_back(ColorTable[9]);
+    pointColors.push_back(ColorTable[9]);
+    pointColors.push_back(ColorTable[9]);
+    pointColors.push_back(ColorTable[9]);
 }
 
 void Face::DrawGeometry(const Matrix& parent) {
@@ -72,15 +74,18 @@ void Face::DrawGeometry(const Matrix& parent) {
         glDrawElements(GL_LINES, 2, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
 
+	
     for(int i = points_Start, p = 0; i < EBOs_range.size(); i += 1, p++) {
         RGB c = pointColors[p % pointColors.size()];
         Shader.SetColor(c.r, c.g, c.b);
 
         glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT,(void*)((offset + i) * sizeof(unsigned int)));
     }
+	
 }
 
-Cube::Cube(World* world, const Point& cent,int tp,std::string name):ShapeNode(world, 0, name), center(cent),sector_Start(0), lines_Start(0), points_Start(0),type(tp) {}
+Cube::Cube(World* world, const Point& cent, std::vector<RGB> colors, int tp, std::string name) :
+	ShapeNode(world, 0, name), center(cent), triColors(colors), sector_Start(0), lines_Start(0), points_Start(0), type(tp) {}
 
 void Cube::Generate() {
 
@@ -102,7 +107,7 @@ void Cube::Generate() {
 
     for(int i = 0; i < 6; i++) {
         Face* f = new Face(world,v[facesIdx[i][0]],v[facesIdx[i][1]],v[facesIdx[i][2]],v[facesIdx[i][3]]);
-
+		f->triColors = {triColors[i],triColors[i]};
         this->AddChildren(f);
         f->Generate();
     }

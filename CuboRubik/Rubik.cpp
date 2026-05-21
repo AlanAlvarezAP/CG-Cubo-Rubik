@@ -25,9 +25,38 @@ Rubik::Rubik(World* world,const Point &center):ShapeNode(world,GL_TRIANGLES,"Cub
 void Rubik::Generate() {
 	std::vector<Cube*> cubos;
 	std::vector<int> types={ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,CENTRO,CENTRO,CENTRO};
+	std::vector<std::vector<RGB>> rubikColors = { // orden de facesIdx en Generate
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 1
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 2
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 3
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 4
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 5
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 6
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 7
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 8
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 9
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 10
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 11
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 12
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 13
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 14
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 15
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO]}, // 16
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[ROJO]}, // 17
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[ROJO]}, // 18
+		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NEGRO],ColorTable[ROJO]}, // 19
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NEGRO],ColorTable[ROJO]}, // 20
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[AMARILLO],ColorTable[NEGRO],ColorTable[ROJO]}, // 21
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[ROJO]}, // 22
+		{ColorTable[AZUL],ColorTable[NEGRO],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[ROJO]}, // 23
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[ROJO]}, // 24
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[ROJO]}, // 25
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 26
+		{ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO],ColorTable[NEGRO]} // 27
+	};
 	
 	for(int i=0;i<27;i++){
-		Cube* tmp=new Cube(this->world,{0.0f,0.0f,0.0f},types[i],std::string{"Cube"+std::to_string(i)});
+		Cube* tmp=new Cube(this->world,{0.0f,0.0f,0.0f},rubikColors[i],types[i],std::string{"Cube"+std::to_string(i)});
 		tmp->Generate();
 		cubos.push_back(tmp);
 	}
