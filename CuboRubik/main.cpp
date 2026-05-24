@@ -255,23 +255,26 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 			}
 			break;
 		}
-		case GLFW_KEY_1:{
-			if(mundito->activeSceneNode->name == "Robot"){
-				robot->Walk(anim);
-			}else{
-				std::cout << "No es robot no se puede caminar" << std::endl;
-			}
-			
-			break;
-		}
-		case GLFW_KEY_2:{
-			std::cout << "Realizando test camara :D " << std::endl;
-			tests_rubik();
-			break;
-		}
+		case GLFW_KEY_1:
+		case GLFW_KEY_2:
 		case GLFW_KEY_3:{
-			std::cout << "Realizando test triples :D " << std::endl;
-			tests_triple();
+			if(mundito->activeSceneNode==rubik){
+				float angle = (mods & GLFW_MOD_SHIFT) ? -90.0f : 90.0f;
+				rubik->Rotation_hori(angle,key-GLFW_KEY_0,anim);
+			}else{
+				std::cout << "No es rubiks no se puede mover" << std::endl;
+			}
+			break;
+		}
+		case GLFW_KEY_4:
+		case GLFW_KEY_5:
+		case GLFW_KEY_6:{
+			if(mundito->activeSceneNode==rubik){
+				float angle = (mods & GLFW_MOD_SHIFT) ? -90.0f : 90.0f;
+				rubik->Rotation_verti(angle,key-GLFW_KEY_0,anim);
+			}else{
+				std::cout << "No es rubiks no se puede mover" << std::endl;
+			}
 			break;
 		}
 		case GLFW_KEY_X:{
@@ -328,12 +331,6 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 			}
 			break;
 		}
-		
-		case GLFW_KEY_O:{
-			Target_free=true;
-			robot->Move(anim);
-			break;
-		}
 		default:{
 			break;
 		}
@@ -385,15 +382,18 @@ int main(){
 	//sphere=Builder::BuildSphereScene(mundito,0.5f);
 	//tower = Builder::BuildTowerScene(mundito);
 	//robot = Builder::BuildRobotScene(mundito);
+	auto inicio = std::chrono::high_resolution_clock::now();
 	rubik=Builder::BuildRubik(mundito);
+	auto fin = std::chrono::high_resolution_clock::now();
+	std::cout << "BuildRubik tardo "<< std::chrono::duration_cast<std::chrono::milliseconds>(fin - inicio).count()<< " ms" <<std::endl;
 	
 	// Ojo aca cambiar escena inicial :D
 	mundito->activeSceneNode= rubik;
 
 	mundito->activeSceneNode->printMenu();
-	general_Menu();
+	//general_Menu();
 	
-	tests_rubik();
+	//tests_rubik();
 
 	set_Vs();
 	mundito->print(mundito->root);
@@ -403,7 +403,7 @@ int main(){
 	float lastTime=glfwGetTime();
 	double fpsTime = 0.0;
 	int fpsFrames = 0;
-	
+	rubik->PrintCamadas();
 	while(!glfwWindowShouldClose(window)){
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -418,7 +418,7 @@ int main(){
 		if (fpsTime >= 1.0) {
 			double fps = fpsFrames / fpsTime;
 
-			std::string title = "Robot OpenGL - FPS: " + std::to_string((int)fps);
+			std::string title = "Cubo Rubik OpenGL - FPS: " + std::to_string((int)fps);
 			glfwSetWindowTitle(window, title.c_str());
 
 			fpsFrames = 0;
@@ -432,6 +432,18 @@ int main(){
 		
 		glfwPollEvents();
 		anim->Execute_animations(dt);
+		if(anim->animations.empty() && rubik->do_permutation){
+			if(rubik->perm_horizontal){
+				rubik->Permutation_horizo(rubik->camada_horits[rubik->perm_option-1]);
+				rubik->Update_contrary(rubik->perm_option,1,rubik->camada_horits[rubik->perm_option-1],rubik->camada_verts);
+			} else {
+				rubik->Permutation_verti(rubik->camada_verts[rubik->perm_option-4]);
+				rubik->Update_contrary(rubik->perm_option,4,rubik->camada_verts[rubik->perm_option-4],rubik->camada_horits);
+			}
+
+			rubik->do_permutation = false;
+			//rubik->PrintCamadas();
+		}
 		
 		// Para seguir
 		if (camMode == TARGETING) {

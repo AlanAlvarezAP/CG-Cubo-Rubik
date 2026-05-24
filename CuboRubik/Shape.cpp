@@ -187,8 +187,8 @@ void ShapeNode::handleKey(int key, int mods,char CURRENT_AXIS){
 
 void ShapeNode::ApplyAnimation(char type,char axis,char local_world,float step){
 	Matrix *mate=&(this->Mat);
-	std::cout << name << " step: " << step << std::endl;
-	std::cout << name << " matrix: " << mate->matrix[12] << std::endl;
+	//std::cout << name << " step: " << step << std::endl;
+	//std::cout << name << " matrix: " << mate->matrix[12] << std::endl;
 	switch(type){
 		case 'a':
 		case 's':{

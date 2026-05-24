@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <queue>
 #include <stack>
 #include <cmath>
@@ -11,6 +12,7 @@
 #include <algorithm>
 #include <thread>
 #include <chrono>
+#include <utility>
 #include <iomanip>
 
 // Para facilitarme la creación de puntos xd
