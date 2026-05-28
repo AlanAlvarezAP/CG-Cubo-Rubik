@@ -21,6 +21,8 @@
 #include <iostream>
 #include <string>
 
+#include <queue>
+
 #include "Shape.h"
 #include "Builder.h"
 
@@ -43,6 +45,15 @@ float dt=0.0f,lastX=0.0f,lastY=0.0f;
 
 Camera_Status camMode = TARGETING;
 int currentSceneIndex = 5;
+
+// for rubik animations
+class Movement{
+public:
+    char type; // v / h
+    float angle; // 90 / -90
+    int layer; // 1..6
+};
+std::queue<Movement> rubikAnimations;
 
 //------------- SECCION DE TESTS ---------------//
 void tests_anim(){
@@ -71,17 +82,43 @@ void tests_anim(){
 	anim->Add_Animations(std::vector<Animation_Step*>{movCam1,rotateCam3}, 'S');
 }
 
-void tests_rubik(){
+void rotation_H_rubik(){
 
 	// CUIDADO CON DOBLE RELEASE
 	// TEST CAMARA
 
 	// rotar la cámara 90 grados en yaw en 4 segundos
-	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
-	Animation_Step* rotateCam2 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'x', 'W');
+	Animation_Step* rotateCam = new Animation_Step(cam, 1.5f, 'o', 360.0f, 'y', 'W');
 
-	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
-	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'N');
+}
+
+void rotation_V_rubik(){
+	Animation_Step* rotateCam2 = new Animation_Step(cam, 1.5f, 'o', 360.0f, 'x', 'W');
+
+	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'N');
+}
+
+void rubik_add_animations(){
+	while(!rubikAnimations.empty())
+		rubikAnimations.pop();
+
+	rubikAnimations.push({'v',90,4});
+	rubikAnimations.push({'v',-90,4});
+	rubikAnimations.push({'h',90,1,});
+	rubikAnimations.push({'h',90,2});
+	rubikAnimations.push({'v',-90,5});
+	rubikAnimations.push({'v',-90,6});
+	rubikAnimations.push({'v',-90,5});
+	rubikAnimations.push({'v',-90,6});
+	rubikAnimations.push({'h',90,3});
+	rubikAnimations.push({'h',90,3});
+	rubikAnimations.push({'h',-90,2});
+	rubikAnimations.push({'h',-90,2});
+	rubikAnimations.push({'h',-90,1});
+	rubikAnimations.push({'h',90,1});
+	rubikAnimations.push({'v',-90,4});
+	rubikAnimations.push({'v',-90,4});
 }
 
 void tests_triple(){
@@ -128,7 +165,6 @@ void orbit(){
 }
 
 void rotate_piramid(){
-
 
 	// rotar la cámara 90 grados en yaw en 4 segundos
 	Animation_Step* rotateCam = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'x', 'L');
@@ -243,7 +279,7 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 	
 	switch(key){
 		case GLFW_KEY_ESCAPE:{
-			std::cout << "ESC presionado saliendo..." << std::endl;
+			// std::cout << "ESC presionado saliendo..." << std::endl;
 			glfwSetWindowShouldClose(window,GLFW_TRUE);
 			break;
 		}
@@ -255,6 +291,25 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 			}
 			break;
 		}
+		
+		case GLFW_KEY_A:{
+			// rubik horizontal rotation animnation
+			rotation_H_rubik();
+			break;
+		}
+		
+		case GLFW_KEY_S:{
+			// rubik vertical rotation animnation
+			rotation_V_rubik();
+			break;
+		}
+		
+		case GLFW_KEY_Q:{
+			// rubik sequence of movements
+			rubik_add_animations();
+			break;
+		}
+		
 		case GLFW_KEY_1:
 		case GLFW_KEY_2:
 		case GLFW_KEY_3:{
@@ -279,12 +334,12 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 		}
 		case GLFW_KEY_X:{
 			CURRENT_AXIS='x';
-			std::cout << "Eje actual:X" << std::endl;
+			std::cout << "Eje actual: X" << std::endl;
 			break;
 		}
 		case GLFW_KEY_Y:{
 			CURRENT_AXIS='y';
-			std::cout << "Eje actual:Y" << std::endl;
+			std::cout << "Eje actual: Y" << std::endl;
 			break;
 		}
 		case GLFW_KEY_Z:{
@@ -320,12 +375,12 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
         }
 		case GLFW_KEY_B: {
 			if (camMode == FREE){
-				std::cout << "Cambiando a modo TARGETING " << std::endl;
+				// std::cout << "Cambiando a modo TARGETING " << std::endl;
 				camMode = TARGETING;
 				cam->UpdateCam(TARGETING,mundito->activeSceneNode->GetWorldPosition());
 			}
 			else{
-				std::cout << "Cambiando a modo FREE " << std::endl;
+				// std::cout << "Cambiando a modo FREE " << std::endl;
 				camMode = FREE;
 				cam->UpdateCam(FREE);
 			}
@@ -392,8 +447,6 @@ int main(){
 
 	mundito->activeSceneNode->printMenu();
 	//general_Menu();
-	
-	//tests_rubik();
 
 	set_Vs();
 	mundito->print(mundito->root);
@@ -403,7 +456,7 @@ int main(){
 	float lastTime=glfwGetTime();
 	double fpsTime = 0.0;
 	int fpsFrames = 0;
-	rubik->PrintCamadas();
+	//rubik->PrintCamadas();
 	while(!glfwWindowShouldClose(window)){
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -434,15 +487,31 @@ int main(){
 		anim->Execute_animations(dt);
 		if(anim->animations.empty() && rubik->do_permutation){
 			if(rubik->perm_horizontal){
-				rubik->Permutation_horizo(rubik->camada_horits[rubik->perm_option-1]);
+				if(rubik->perm_direccion_horaria)
+					rubik->Permutation_horizo(rubik->camada_horits[rubik->perm_option-1]);
+				else
+					rubik->Permutation_verti(rubik->camada_horits[rubik->perm_option-1]);
 				rubik->Update_contrary(rubik->perm_option,1,rubik->camada_horits[rubik->perm_option-1],rubik->camada_verts);
 			} else {
-				rubik->Permutation_verti(rubik->camada_verts[rubik->perm_option-4]);
+				if(rubik->perm_direccion_horaria)
+					rubik->Permutation_verti(rubik->camada_verts[rubik->perm_option-4]);
+				else
+					rubik->Permutation_horizo(rubik->camada_verts[rubik->perm_option-4]);
 				rubik->Update_contrary(rubik->perm_option,4,rubik->camada_verts[rubik->perm_option-4],rubik->camada_horits);
 			}
 
 			rubik->do_permutation = false;
 			//rubik->PrintCamadas();
+		}
+		
+		// for rubik sequence animation
+		if(anim->animations.empty() && !rubik->do_permutation && !rubikAnimations.empty()){
+			Movement mov = rubikAnimations.front();
+			rubikAnimations.pop();
+			if(mov.type == 'h')
+				rubik->Rotation_hori(mov.angle, mov.layer, anim);
+			else if(mov.type == 'v')
+				rubik->Rotation_verti(mov.angle, mov.layer, anim);
 		}
 		
 		// Para seguir

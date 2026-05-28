@@ -144,7 +144,7 @@ void Rubik::Generate() {
 	
 }
 
-void Rubik::Permutation_horizo(std::vector<Cube*> &cam){
+void Rubik::Permutation_horizo(std::vector<Cube*> &cam){ // horario
 	std::vector<Cube*> tmp=cam;
 	
 	cam[2]=tmp[0];
@@ -157,7 +157,7 @@ void Rubik::Permutation_horizo(std::vector<Cube*> &cam){
 	cam[6]=tmp[8];
 }
 
-void Rubik::Permutation_verti(std::vector<Cube*> &cam){
+void Rubik::Permutation_verti(std::vector<Cube*> &cam){ // antihorario
 	std::vector<Cube*> tmp=cam;
 
 	cam[6]=tmp[0];
@@ -172,11 +172,11 @@ void Rubik::Permutation_verti(std::vector<Cube*> &cam){
 void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_changed,std::vector<std::vector<Cube*>> &camadas){
 	int block=option-offset;
 	for(int i=0;i<camadas.size();i++){ 
-		auto& row = camadas[i];
+		auto& row=camadas[i];
 		for(int j=0;j<3;j++){ 
-			int col=j+block*3;
+			int col=j+(block*3);
 			if(col>=0 && col<row.size()){
-                row[col]=camada_changed[i*3+j];
+                row[col]=camada_changed[(i*3)+j];
 			}else{
 				std::cout << "Acceso ilegal cuidao" << std::endl;
 			}
@@ -185,6 +185,10 @@ void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_cha
 }
 
 void Rubik::Rotation_hori(float value_rot,int option,Animator* &anim){
+	if(!anim->animations.empty())
+        return;
+	if(do_permutation)
+		return;
 	if(option <= 0 || option > 3){
 		std::cout << "Opcion de rotacion horizontal invalida :( " << std::endl;
 		return;
@@ -192,33 +196,37 @@ void Rubik::Rotation_hori(float value_rot,int option,Animator* &anim){
 	
 	std::vector<Animation_Step*> steps;
 
-	for (auto* cube : camada_horits[option-1]) {
-		steps.push_back(new Animation_Step(cube, 1.0f, 'd', value_rot, 'x', 'W'));
+	for(auto* cube : camada_horits[option-1]){
+		steps.push_back(new Animation_Step(cube, 0.4f, 'd', value_rot, 'x', 'W'));
 	}
 	anim->Add_Animations(steps, 'N');
 
 	do_permutation = true;
     perm_option = option;
     perm_horizontal = true;
-	
+	perm_direccion_horaria = (value_rot > 0);
 }
 
 void Rubik::Rotation_verti(float value_rot,int option,Animator* &anim){
+	if(!anim->animations.empty())
+        return;
+	if(do_permutation)
+		return;
 	if(option <= 3 || option > 6){
 		std::cout << "Opcion de rotacion vertical invalida :( " << std::endl;
 		return;
 	}
 	
 	std::vector<Animation_Step*> steps;
-	for (auto* cube : camada_verts[option-4]) {
-		steps.push_back(new Animation_Step(cube, 1.0f, 'd', value_rot, 'y', 'W'));
+	for(auto* cube : camada_verts[option-4]){
+		steps.push_back(new Animation_Step(cube, 0.4f, 'd', value_rot, 'y', 'W'));
 	}
 	anim->Add_Animations(steps, 'N');
 	
 	do_permutation = true;
     perm_option = option;
     perm_horizontal = false;
-	
+	perm_direccion_horaria = (value_rot > 0);
 }
 
 
@@ -289,6 +297,9 @@ void Rubik::printMenu(){
 	std::cout << "|  4. Mover Camada Verti 1        |" << std::endl;
 	std::cout << "|  5. Mover Camada Verti 2        |" << std::endl;
 	std::cout << "|  6. Mover Camada Verti 3        |" << std::endl;
+	std::cout << "|  A. Animacion horizontal        |" << std::endl;
+	std::cout << "|  S. Animacion vertical          |" << std::endl;
+	std::cout << "|  Q. Animacion de camadas        |" << std::endl;
     std::cout << "|  ESC/CTRL+C. Salir              |" << std::endl;
     std::cout << "===================================" << std::endl;
 }

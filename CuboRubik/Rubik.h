@@ -17,6 +17,7 @@ public:
 	bool do_permutation;
 	int perm_option;
 	bool perm_horizontal;
+	bool perm_direccion_horaria;
 	// Solver
 public:
 	Rubik(World* world, const Point& cent);
