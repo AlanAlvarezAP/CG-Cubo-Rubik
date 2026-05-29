@@ -499,34 +499,34 @@ int main(){
 		anim->Execute_animations(dt);
 		if(anim->animations.empty() && rubik->do_permutation){
 			try{
-			if(rubik->perm_eje==1){ // horizontal
-				int h = rubik->perm_option - 1;
-				std::cout << ">>> PERMUTANDO HORIZONTAL | h: " << h << " | size: " << rubik->camada_horits[h].size() << std::endl;
-				if(rubik->perm_direccion_horaria)
-					rubik->Permutation_horaria(rubik->camada_horits[h]);
-				else
-					rubik->Permutation_antihoraria(rubik->camada_horits[h]);
-				//rubik->Update_contrary(rubik->perm_option,1,rubik->camada_horits[rubik->perm_option-1],rubik->camada_verts);
-				rubik->sync_from_hori(h);
-			} else if(rubik->perm_eje==2) {
-				int v = rubik->perm_option - 4;
-				std::cout << ">>> PERMUTANDO VERTICAL | v: " << v << " | size: " << rubik->camada_verts[v].size() << std::endl;
-				if(rubik->perm_direccion_horaria)
-					rubik->Permutation_antihoraria(rubik->camada_verts[v]);
-				else
-					rubik->Permutation_horaria(rubik->camada_verts[v]);
-				//rubik->Update_contrary(rubik->perm_option,4,rubik->camada_verts[rubik->perm_option-4],rubik->camada_horits);
-				rubik->sync_from_verti(v);
-			} else if(rubik->perm_eje==3) {
-				int p = rubik->perm_option - 7;
-				std::cout << ">>> PERMUTANDO PROFUNDA | p: " << p << " | size: " << rubik->camada_prof[p].size() << std::endl;
-				if(rubik->perm_direccion_horaria)
-					rubik->Permutation_antihoraria(rubik->camada_prof[p]);
-				else
-					rubik->Permutation_horaria(rubik->camada_prof[p]);
-				//rubik->Update_contrary(rubik->perm_option,7,rubik->camada_prof[rubik->perm_option-7],rubik->camada_prof);
-				rubik->sync_from_prof(p);
-			}
+				if(rubik->perm_eje==1){ // horizontal
+					int h = rubik->perm_option - 1;
+					std::cout << ">>> PERMUTANDO HORIZONTAL | h: " << h << " | size: " << rubik->camada_horits[h].size() << std::endl;
+					if(rubik->perm_direccion_horaria)
+						rubik->Permutation_horaria(rubik->camada_horits[h]);
+					else
+						rubik->Permutation_antihoraria(rubik->camada_horits[h]);
+					//rubik->Update_contrary(rubik->perm_option,1,rubik->camada_horits[rubik->perm_option-1],rubik->camada_verts);
+					rubik->sync_from_hori(h);
+				} else if(rubik->perm_eje==2) { // Vertical
+					int v = rubik->perm_option - 4;
+					std::cout << ">>> PERMUTANDO VERTICAL | v: " << v << " | size: " << rubik->camada_verts[v].size() << std::endl;
+					if(rubik->perm_direccion_horaria)
+						rubik->Permutation_antihoraria(rubik->camada_verts[v]);
+					else
+						rubik->Permutation_horaria(rubik->camada_verts[v]);
+					//rubik->Update_contrary(rubik->perm_option,4,rubik->camada_verts[rubik->perm_option-4],rubik->camada_horits);
+					rubik->sync_from_verti(v);
+				} else if(rubik->perm_eje==3) { // Profunda
+					int p = rubik->perm_option - 7;
+					std::cout << ">>> PERMUTANDO PROFUNDA | p: " << p << " | size: " << rubik->camada_prof[p].size() << std::endl;
+					if(rubik->perm_direccion_horaria)
+						rubik->Permutation_antihoraria(rubik->camada_prof[p]);
+					else
+						rubik->Permutation_horaria(rubik->camada_prof[p]);
+					//rubik->Update_contrary(rubik->perm_option,7,rubik->camada_prof[rubik->perm_option-7],rubik->camada_prof);
+					rubik->sync_from_prof(p);
+				}
 			}
 			catch(const std::exception& e){
 				std::cerr << "!!! EXPLOSION EN MEMORIA CAPTURADA: " << e.what() << '\n';
