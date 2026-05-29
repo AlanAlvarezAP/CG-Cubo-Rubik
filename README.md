@@ -17,9 +17,9 @@ Repositorio para el primer proyecto grupal del curso de Computación Grafica Cco
    - [x] Coloreo
  
 * Animación
-   - [ ] Generar Algoritmo de movimiento de camadas
-   - [ ] Actualización de punteros
-   - [ ] Animación con transformaciones
+   - [x] Generar Algoritmo de movimiento de camadas
+   - [x] Actualización de punteros
+   - [x] Animación con transformaciones
  
 * Solver
    - [ ] Definición de Solver
