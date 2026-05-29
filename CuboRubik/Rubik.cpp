@@ -62,93 +62,114 @@ void Rubik::Generate() {
 
 	// Añadiendo todos los cubos
 	// Actualizando pos
+	// front ?
 	cubos[0]->Mat.UpdateView('a',-0.42,-0.42, 0.42,'x','W');
 	cubos[1]->Mat.UpdateView('a',-0.42, 0.0 , 0.42,'x','W');
 	cubos[2]->Mat.UpdateView('a',-0.42, 0.42, 0.42,'x','W');
-	cubos[3]->Mat.UpdateView('a',-0.42, 0.42, 0.0 ,'x','W');
-	cubos[4]->Mat.UpdateView('a',-0.42, 0.42,-0.42,'x','W');
-	cubos[5]->Mat.UpdateView('a',-0.42, 0.0 ,-0.42,'x','W');
-	cubos[6]->Mat.UpdateView('a',-0.42,-0.42,-0.42,'x','W');
-	cubos[7]->Mat.UpdateView('a',-0.42,-0.42, 0.0 ,'x','W');
 
 	cubos[8]->Mat.UpdateView('a',0.0,-0.42, 0.42,'x','W');
 	cubos[9]->Mat.UpdateView('a',0.0, 0.0 , 0.42,'x','W');
 	cubos[10]->Mat.UpdateView('a',0.0, 0.42, 0.42,'x','W');
-	cubos[11]->Mat.UpdateView('a',0.0, 0.42, 0.0 ,'x','W');
-	cubos[12]->Mat.UpdateView('a',0.0, 0.42,-0.42,'x','W');
-	cubos[13]->Mat.UpdateView('a',0.0, 0.0 ,-0.42,'x','W');
-	cubos[14]->Mat.UpdateView('a',0.0,-0.42,-0.42,'x','W');
-	cubos[15]->Mat.UpdateView('a',0.0,-0.42, 0.0 ,'x','W');
 
 	cubos[16]->Mat.UpdateView('a',0.42,-0.42, 0.42,'x','W');
 	cubos[17]->Mat.UpdateView('a',0.42, 0.0 , 0.42,'x','W');
 	cubos[18]->Mat.UpdateView('a',0.42, 0.42, 0.42,'x','W');
-	cubos[19]->Mat.UpdateView('a',0.42, 0.42, 0.0 ,'x','W');
-	cubos[20]->Mat.UpdateView('a',0.42, 0.42,-0.42,'x','W');
-	cubos[21]->Mat.UpdateView('a',0.42, 0.0 ,-0.42,'x','W');
-	cubos[22]->Mat.UpdateView('a',0.42,-0.42,-0.42,'x','W');
+
+	// mid ?
+	cubos[7]->Mat.UpdateView('a',-0.42,-0.42, 0.0 ,'x','W');
+	cubos[25]->Mat.UpdateView('a',-0.42, 0.0, 0.0,'x','W');
+	cubos[3]->Mat.UpdateView('a',-0.42, 0.42, 0.0 ,'x','W');
+
+	cubos[15]->Mat.UpdateView('a',0.0,-0.42, 0.0 ,'x','W');
+	cubos[26]->Mat.UpdateView('a',0.0, 0.0, 0.0,'x','W');
+	cubos[11]->Mat.UpdateView('a',0.0, 0.42, 0.0 ,'x','W');
+
 	cubos[23]->Mat.UpdateView('a',0.42,-0.42, 0.0 ,'x','W');
+	cubos[24]->Mat.UpdateView('a',0.42,0.0, 0.0,'x','W');
+	cubos[19]->Mat.UpdateView('a',0.42, 0.42, 0.0 ,'x','W');
+
+	// back ?
+	cubos[6]->Mat.UpdateView('a',-0.42,-0.42,-0.42,'x','W');
+	cubos[5]->Mat.UpdateView('a',-0.42, 0.0 ,-0.42,'x','W');
+	cubos[4]->Mat.UpdateView('a',-0.42, 0.42,-0.42,'x','W');
+
+	cubos[14]->Mat.UpdateView('a',0.0,-0.42,-0.42,'x','W');
+	cubos[13]->Mat.UpdateView('a',0.0, 0.0 ,-0.42,'x','W');
+	cubos[12]->Mat.UpdateView('a',0.0, 0.42,-0.42,'x','W');
+
+	cubos[22]->Mat.UpdateView('a',0.42,-0.42,-0.42,'x','W');
+	cubos[21]->Mat.UpdateView('a',0.42, 0.0 ,-0.42,'x','W');
+	cubos[20]->Mat.UpdateView('a',0.42, 0.42,-0.42,'x','W');
 
 	// DUMMY centrado en el medio
-	cubos[24]->Mat.UpdateView('a',0.42,0.0, 0.0,'x','W');
-	cubos[25]->Mat.UpdateView('a',-0.42,0.0, 0.0,'x','W');
-	cubos[26]->Mat.UpdateView('a',0.0, 0.0, 0.0,'x','W');
 	
 	// front - green
-	// left - white
-	// orange - up
+	// left - orange
+	// orange - yellow
 	
-	// mini-CV1
+	// TODO: change orientazions??
+
+	// Camada CH1 - bottom
 	camada_verts[0]={
-		// Camada CH1
+		// mini-Ch1
 		cubos[0],cubos[7],cubos[6],
-		// mini-CV2
+		// mini-Ch2
 		cubos[8],cubos[15],cubos[14],
-		// mini-CV3
+		// mini-Ch3
 		cubos[16],cubos[23],cubos[22]
 	};
 
-	// Camada CV2
-	// mini-CV1
-	camada_verts[1]={cubos[1],cubos[25],cubos[5],
-	// mini-CV2
-	cubos[9],cubos[26],cubos[13],
-	// mini-CV3
-	cubos[17],cubos[24],cubos[21]};
+	// Camada CH2 - mid
+	camada_verts[1]={
+		// mini-Ch1
+		cubos[1],cubos[25],cubos[5],
+		// mini-Ch2
+		cubos[9],cubos[26],cubos[13],
+		// mini-Ch3
+		cubos[17],cubos[24],cubos[21]
+	};
 
-	// Camada CV3
-	// mini-CV1
-	camada_verts[2]={cubos[2],cubos[3],cubos[4],
-	// mini-CV2
-	cubos[10],cubos[11],cubos[12],
-	// mini-CV3
-	cubos[18],cubos[19],cubos[20]};
+	// Camada CH3 - up
+	camada_verts[2]={
+		// mini-Ch1
+		cubos[2],cubos[3],cubos[4],
+		// mini-Ch2
+		cubos[10],cubos[11],cubos[12],
+		// mini-Ch3
+		cubos[18],cubos[19],cubos[20]
+	};
 	
-	// Camada CH1
-	// mini-CH1
-	camada_horits[0] = {cubos[0],cubos[7],cubos[6],
-	// mini-CH2
-	cubos[1],cubos[25],cubos[5],
-	// mini-CH3
-	cubos[2],cubos[3],cubos[4]};
+	// Camada CV1 - left
+	camada_horits[0] = {
+		// mini-Cv1
+		cubos[0],cubos[7],cubos[6],
+		// mini-Cv2
+		cubos[1],cubos[25],cubos[5],
+		// mini-Cv3
+		cubos[2],cubos[3],cubos[4]
+	};
 	
-	// Camada CH2
-	// mini-CH1
-	camada_horits[1]={cubos[8],cubos[15],cubos[14],
-	// mini-CH2
-	cubos[9],cubos[26],cubos[13],
-	// mini-CH3
-	cubos[10],cubos[11],cubos[12]};
+	// Camada CV2 - mid
+	camada_horits[1]={
+		// mini-Cv1
+		cubos[8],cubos[15],cubos[14],
+		// mini-Cv2
+		cubos[9],cubos[26],cubos[13],
+		// mini-Cv3
+		cubos[10],cubos[11],cubos[12]
+	};
 	
-	// Camada CH3
-	// mini-CH1
-	camada_horits[2]={cubos[16],cubos[23],cubos[22],
-	// mini-CH2
-	cubos[17],cubos[24],cubos[21],
-	// mini-CH3
-	cubos[18],cubos[19],cubos[20]};
+	// Camada CV3 - right
+	camada_horits[2]={
+		// mini-Cv1
+		cubos[16],cubos[23],cubos[22],
+		// mini-Cv2
+		cubos[17],cubos[24],cubos[21],
+		// mini-Cv3
+		cubos[18],cubos[19],cubos[20]
+	};
 	
-	// Camada CP1
+	// Camada CP1 - front
 	camada_prof[0]={
 		// mini-CP1
 		cubos[0],cubos[1],cubos[2],
@@ -158,7 +179,7 @@ void Rubik::Generate() {
 		cubos[16],cubos[17],cubos[18],
 	};
 	
-	// Camada CP2
+	// Camada CP2 - mid
 	camada_prof[1]={
 		// mini-CP1
 		cubos[7],cubos[25],cubos[3],
@@ -168,7 +189,7 @@ void Rubik::Generate() {
 		cubos[23],cubos[24],cubos[19],
 	};
 	
-	// Camada CP2
+	// Camada CP2 - back
 	camada_prof[2]={
 		// mini-CP1
 		cubos[6],cubos[5],cubos[4],
