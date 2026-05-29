@@ -241,7 +241,7 @@ void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_cha
 	}
 }
 */
-// horizontal ?? or vertical
+// deep and vertical
 void Rubik::sync_from_hori(int v) {
     for(int h = 0; h < 3; h++) {
         for(int p = 0; p < 3; p++) {
@@ -252,7 +252,7 @@ void Rubik::sync_from_hori(int v) {
     }
 }
 
-// vertical ? or horizontal
+// deep or horizontal
 void Rubik::sync_from_verti(int h) {
     for(int v = 0; v < 3; v++) {
         for(int p = 0; p < 3; p++) {
@@ -263,6 +263,7 @@ void Rubik::sync_from_verti(int h) {
     }
 }
 
+// vertical or horizontal
 void Rubik::sync_from_prof(int p) {
     for(int v = 0; v < 3; v++) {
         for(int h = 0; h < 3; h++) {
@@ -427,10 +428,18 @@ void Rubik::PrintCamadas(){
 		}
 	}
 	std::cout << " PARA CAMADAS HORIZONTAL " << std::endl;
-	for(int i=0;i<camada_verts.size();i++){
+	for(int i=0;i<camada_horits.size();i++){
 		std::cout << "Camada horizontal -> " << i << std::endl;
-		for(int j=0;j<camada_verts[i].size();j++){
-			std::cout << "Cubo # " << camada_verts[i][j]->name << std::endl;
+		for(int j=0;j<camada_horits[i].size();j++){
+			std::cout << "Cubo # " << camada_horits[i][j]->name << std::endl;
+		}
+	}
+	
+	std::cout << " PARA CAMADAS PROFUNDAS " << std::endl;
+	for(int i=0;i<camada_prof.size();i++){
+		std::cout << "Camada horizontal -> " << i << std::endl;
+		for(int j=0;j<camada_prof[i].size();j++){
+			std::cout << "Cubo # " << camada_prof[i][j]->name << std::endl;
 		}
 	}
 	std::cout << "-------------------------------" << std::endl;
