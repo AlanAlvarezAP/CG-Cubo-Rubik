@@ -4,7 +4,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-Rubik::Rubik(World* world,const Point &center):ShapeNode(world,GL_TRIANGLES,"Cubo Rubik"),centro(center),do_permutation(false),perm_option(0),perm_horizontal(true){}
+Rubik::Rubik(World* world,const Point &center):ShapeNode(world,GL_TRIANGLES,"Cubo Rubik"),centro(center),do_permutation(false),perm_option(0),perm_eje(1){}
 
 
 // Camadas
@@ -58,6 +58,7 @@ void Rubik::Generate() {
 
 	camada_horits.resize(3);
 	camada_verts.resize(3);
+	camada_prof.resize(3);
 
 	// Añadiendo todos los cubos
 	// Actualizando pos
@@ -93,15 +94,21 @@ void Rubik::Generate() {
 	cubos[25]->Mat.UpdateView('a',-0.42,0.0, 0.0,'x','W');
 	cubos[26]->Mat.UpdateView('a',0.0, 0.0, 0.0,'x','W');
 	
-	// Camada CH1
+	// front - green
+	// left - white
+	// orange - up
+	
 	// mini-CV1
-	camada_verts[0]={cubos[0],cubos[7],cubos[6],
-	// mini-CV2
-	cubos[8],cubos[15],cubos[14],
-	// mini-CV3
-	cubos[16],cubos[23],cubos[22]};
+	camada_verts[0]={
+		// Camada CH1
+		cubos[0],cubos[7],cubos[6],
+		// mini-CV2
+		cubos[8],cubos[15],cubos[14],
+		// mini-CV3
+		cubos[16],cubos[23],cubos[22]
+	};
 
-	// Camada CH2
+	// Camada CV2
 	// mini-CV1
 	camada_verts[1]={cubos[1],cubos[25],cubos[5],
 	// mini-CV2
@@ -109,8 +116,7 @@ void Rubik::Generate() {
 	// mini-CV3
 	cubos[17],cubos[24],cubos[21]};
 
-	
-	// Camada CH3
+	// Camada CV3
 	// mini-CV1
 	camada_verts[2]={cubos[2],cubos[3],cubos[4],
 	// mini-CV2
@@ -118,7 +124,7 @@ void Rubik::Generate() {
 	// mini-CV3
 	cubos[18],cubos[19],cubos[20]};
 	
-	// Camada CV1
+	// Camada CH1
 	// mini-CH1
 	camada_horits[0] = {cubos[0],cubos[7],cubos[6],
 	// mini-CH2
@@ -126,7 +132,7 @@ void Rubik::Generate() {
 	// mini-CH3
 	cubos[2],cubos[3],cubos[4]};
 	
-	// Camada CV2
+	// Camada CH2
 	// mini-CH1
 	camada_horits[1]={cubos[8],cubos[15],cubos[14],
 	// mini-CH2
@@ -134,7 +140,7 @@ void Rubik::Generate() {
 	// mini-CH3
 	cubos[10],cubos[11],cubos[12]};
 	
-	// Camada CV3
+	// Camada CH3
 	// mini-CH1
 	camada_horits[2]={cubos[16],cubos[23],cubos[22],
 	// mini-CH2
@@ -142,9 +148,38 @@ void Rubik::Generate() {
 	// mini-CH3
 	cubos[18],cubos[19],cubos[20]};
 	
+	// Camada CP1
+	camada_prof[0]={
+		// mini-CP1
+		cubos[0],cubos[1],cubos[2],
+		// mini-CP2
+		cubos[8],cubos[9],cubos[10],
+		// mini-CP3
+		cubos[16],cubos[17],cubos[18],
+	};
+	
+	// Camada CP2
+	camada_prof[1]={
+		// mini-CP1
+		cubos[7],cubos[25],cubos[3],
+		// mini-CP2
+		cubos[15],cubos[26],cubos[11],
+		// mini-CP3
+		cubos[23],cubos[24],cubos[19],
+	};
+	
+	// Camada CP2
+	camada_prof[2]={
+		// mini-CP1
+		cubos[6],cubos[5],cubos[4],
+		// mini-CP2
+		cubos[14],cubos[13],cubos[12],
+		// mini-CP3
+		cubos[22],cubos[21],cubos[20],
+	};
 }
 
-void Rubik::Permutation_horizo(std::vector<Cube*> &cam){ // horario
+void Rubik::Permutation_horaria(std::vector<Cube*> &cam){ // horario
 	std::vector<Cube*> tmp=cam;
 	
 	cam[2]=tmp[0];
@@ -157,7 +192,7 @@ void Rubik::Permutation_horizo(std::vector<Cube*> &cam){ // horario
 	cam[6]=tmp[8];
 }
 
-void Rubik::Permutation_verti(std::vector<Cube*> &cam){ // antihorario
+void Rubik::Permutation_antihoraria(std::vector<Cube*> &cam){ // antihorario
 	std::vector<Cube*> tmp=cam;
 
 	cam[6]=tmp[0];
@@ -169,6 +204,7 @@ void Rubik::Permutation_verti(std::vector<Cube*> &cam){ // antihorario
 	cam[5]=tmp[7];
 	cam[2]=tmp[8];
 }
+/*
 void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_changed,std::vector<std::vector<Cube*>> &camadas){
 	int block=option-offset;
 	for(int i=0;i<camadas.size();i++){ 
@@ -182,6 +218,38 @@ void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_cha
 			}
 		} 
 	}
+}
+*/
+// horizontal ?? or vertical
+void Rubik::sync_from_hori(int v) {
+    for(int h = 0; h < 3; h++) {
+        for(int p = 0; p < 3; p++) {
+            Cube* c = camada_horits[v][h*3 + p];
+            camada_verts[h][v*3 + p] = c;
+            camada_prof[p][v*3 + h] = c;
+        }
+    }
+}
+
+// vertical ? or horizontal
+void Rubik::sync_from_verti(int h) {
+    for(int v = 0; v < 3; v++) {
+        for(int p = 0; p < 3; p++) {
+            Cube* c = camada_verts[h][v*3 + p];
+            camada_horits[v][h*3 + p] = c;
+            camada_prof[p][v*3 + h] = c;
+        }
+    }
+}
+
+void Rubik::sync_from_prof(int p) {
+    for(int v = 0; v < 3; v++) {
+        for(int h = 0; h < 3; h++) {
+            Cube* c = camada_prof[p][v*3 + h];
+            camada_horits[v][h*3 + p] = c;
+            camada_verts[h][v*3 + p] = c;
+        }
+    }
 }
 
 void Rubik::Rotation_hori(float value_rot,int option,Animator* &anim){
@@ -197,13 +265,13 @@ void Rubik::Rotation_hori(float value_rot,int option,Animator* &anim){
 	std::vector<Animation_Step*> steps;
 
 	for(auto* cube : camada_horits[option-1]){
-		steps.push_back(new Animation_Step(cube, 0.4f, 'd', value_rot, 'x', 'W'));
+		steps.push_back(new Animation_Step(cube, 0.3f, 'd', value_rot, 'x', 'W'));
 	}
 	anim->Add_Animations(steps, 'N');
 
 	do_permutation = true;
     perm_option = option;
-    perm_horizontal = true;
+    perm_eje = 1;
 	perm_direccion_horaria = (value_rot > 0);
 }
 
@@ -219,16 +287,37 @@ void Rubik::Rotation_verti(float value_rot,int option,Animator* &anim){
 	
 	std::vector<Animation_Step*> steps;
 	for(auto* cube : camada_verts[option-4]){
-		steps.push_back(new Animation_Step(cube, 0.4f, 'd', value_rot, 'y', 'W'));
+		steps.push_back(new Animation_Step(cube, 0.3f, 'd', value_rot, 'y', 'W'));
 	}
 	anim->Add_Animations(steps, 'N');
 	
 	do_permutation = true;
     perm_option = option;
-    perm_horizontal = false;
+    perm_eje = 2;
 	perm_direccion_horaria = (value_rot > 0);
 }
 
+void Rubik::Rotation_prof(float value_rot,int option,Animator* &anim){
+	if(!anim->animations.empty())
+        return;
+	if(do_permutation)
+		return;
+	if(option <= 6 || option > 9){
+		std::cout << "Opcion de rotacion profunda invalida :( " << std::endl;
+		return;
+	}
+	
+	std::vector<Animation_Step*> steps;
+	for(auto* cube : camada_prof[option-7]){
+		steps.push_back(new Animation_Step(cube, 0.3f, 'd', value_rot, 'z', 'W'));
+	}
+	anim->Add_Animations(steps, 'N');
+	
+	do_permutation = true;
+    perm_option = option;
+    perm_eje = 3;
+	perm_direccion_horaria = (value_rot > 0);
+}
 
 void Rubik::handleKey(int key, int mods,char CURRENT_AXIS){
 	ShapeNode* target = this;
@@ -297,6 +386,9 @@ void Rubik::printMenu(){
 	std::cout << "|  4. Mover Camada Verti 1        |" << std::endl;
 	std::cout << "|  5. Mover Camada Verti 2        |" << std::endl;
 	std::cout << "|  6. Mover Camada Verti 3        |" << std::endl;
+	std::cout << "|  7. Mover Camada Prof  1        |" << std::endl;
+	std::cout << "|  8. Mover Camada Prof  2        |" << std::endl;
+	std::cout << "|  9. Mover Camada Prof  3        |" << std::endl;
 	std::cout << "|  A. Animacion horizontal        |" << std::endl;
 	std::cout << "|  S. Animacion vertical          |" << std::endl;
 	std::cout << "|  Q. Animacion de camadas        |" << std::endl;
