@@ -4,8 +4,13 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-Rubik::Rubik(World* world,const Point &center):ShapeNode(world,GL_TRIANGLES,"Cubo Rubik"),centro(center),do_permutation(false),perm_option(0),perm_eje(1){}
-
+Rubik::Rubik(World* world,const Point &center) :
+	ShapeNode(world,GL_TRIANGLES,"Cubo Rubik"),
+	centro(center),
+	do_permutation(false),
+	permutation_option(0),
+	permutation_axi(1)
+	{}
 
 // Camadas
 // Horizontal -> 0
@@ -17,7 +22,14 @@ Rubik::Rubik(World* world,const Point &center):ShapeNode(world,GL_TRIANGLES,"Cub
 // Centro -> 2 (1 color)
 void Rubik::Generate() {
 	
-	int types[27]={ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,CENTRO,CENTRO,CENTRO};
+	int types[27]={
+		ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,
+		MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,MEDIO_CENTRO,CENTRO,
+		MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,CENTRO,MEDIO_CENTRO,
+		CENTRO,ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,
+		ESQUINA,MEDIO_CENTRO,ESQUINA,MEDIO_CENTRO,
+		CENTRO,CENTRO,CENTRO
+	};
 	
 	std::vector<std::vector<RGB>> rubikColors = { // orden de facesIdx en Generate
 		{ColorTable[NEGRO],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[NEGRO],ColorTable[NARANJA],ColorTable[NEGRO]}, // 1
@@ -52,157 +64,154 @@ void Rubik::Generate() {
 	for(int i=0;i<27;i++){
 		Cube* tmp=new Cube(this->world,{0.0f,0.0f,0.0f},rubikColors[i],types[i],std::string{"Cube"+std::to_string(i)});
 		tmp->Generate();
-		cubos.push_back(tmp);
+		cubes.push_back(tmp);
 		this->AddChildren(tmp);
 	}
 
-	camada_horits.resize(3);
-	camada_verts.resize(3);
-	camada_prof.resize(3);
+	horizontal_set.resize(3);
+	vertical_set.resize(3);
+	deep_set.resize(3);
 
 	// Añadiendo todos los cubos
 	// Actualizando pos
-	// front ?
-	cubos[0]->Mat.UpdateView('a',-0.42,-0.42, 0.42,'x','W');
-	cubos[1]->Mat.UpdateView('a',-0.42, 0.0 , 0.42,'x','W');
-	cubos[2]->Mat.UpdateView('a',-0.42, 0.42, 0.42,'x','W');
+	// front
+	cubes[0]->Mat.UpdateView('a',-0.42,-0.42, 0.42,'x','W');
+	cubes[1]->Mat.UpdateView('a',-0.42, 0.0 , 0.42,'x','W');
+	cubes[2]->Mat.UpdateView('a',-0.42, 0.42, 0.42,'x','W');
 
-	cubos[8]->Mat.UpdateView('a',0.0,-0.42, 0.42,'x','W');
-	cubos[9]->Mat.UpdateView('a',0.0, 0.0 , 0.42,'x','W');
-	cubos[10]->Mat.UpdateView('a',0.0, 0.42, 0.42,'x','W');
+	cubes[8]->Mat.UpdateView( 'a',0.0,-0.42, 0.42,'x','W');
+	cubes[9]->Mat.UpdateView( 'a',0.0, 0.0 , 0.42,'x','W');
+	cubes[10]->Mat.UpdateView('a',0.0, 0.42, 0.42,'x','W');
 
-	cubos[16]->Mat.UpdateView('a',0.42,-0.42, 0.42,'x','W');
-	cubos[17]->Mat.UpdateView('a',0.42, 0.0 , 0.42,'x','W');
-	cubos[18]->Mat.UpdateView('a',0.42, 0.42, 0.42,'x','W');
+	cubes[16]->Mat.UpdateView('a',0.42,-0.42, 0.42,'x','W');
+	cubes[17]->Mat.UpdateView('a',0.42, 0.0 , 0.42,'x','W');
+	cubes[18]->Mat.UpdateView('a',0.42, 0.42, 0.42,'x','W');
 
-	// mid ?
-	cubos[7]->Mat.UpdateView('a',-0.42,-0.42, 0.0 ,'x','W');
-	cubos[25]->Mat.UpdateView('a',-0.42, 0.0, 0.0,'x','W');
-	cubos[3]->Mat.UpdateView('a',-0.42, 0.42, 0.0 ,'x','W');
+	// mid
+	cubes[7]->Mat.UpdateView( 'a',-0.42,-0.42, 0.0,'x','W');
+	cubes[25]->Mat.UpdateView('a',-0.42, 0.0 , 0.0,'x','W');
+	cubes[3]->Mat.UpdateView( 'a',-0.42, 0.42, 0.0,'x','W');
 
-	cubos[15]->Mat.UpdateView('a',0.0,-0.42, 0.0 ,'x','W');
-	cubos[26]->Mat.UpdateView('a',0.0, 0.0, 0.0,'x','W');
-	cubos[11]->Mat.UpdateView('a',0.0, 0.42, 0.0 ,'x','W');
+	cubes[15]->Mat.UpdateView('a',0.0,-0.42, 0.0,'x','W');
+	cubes[26]->Mat.UpdateView('a',0.0, 0.0 , 0.0,'x','W');
+	cubes[11]->Mat.UpdateView('a',0.0, 0.42, 0.0,'x','W');
 
-	cubos[23]->Mat.UpdateView('a',0.42,-0.42, 0.0 ,'x','W');
-	cubos[24]->Mat.UpdateView('a',0.42,0.0, 0.0,'x','W');
-	cubos[19]->Mat.UpdateView('a',0.42, 0.42, 0.0 ,'x','W');
+	cubes[23]->Mat.UpdateView('a',0.42,-0.42, 0.0,'x','W');
+	cubes[24]->Mat.UpdateView('a',0.42, 0.0 , 0.0,'x','W');
+	cubes[19]->Mat.UpdateView('a',0.42, 0.42, 0.0,'x','W');
 
-	// back ?
-	cubos[6]->Mat.UpdateView('a',-0.42,-0.42,-0.42,'x','W');
-	cubos[5]->Mat.UpdateView('a',-0.42, 0.0 ,-0.42,'x','W');
-	cubos[4]->Mat.UpdateView('a',-0.42, 0.42,-0.42,'x','W');
+	// back
+	cubes[6]->Mat.UpdateView('a',-0.42,-0.42,-0.42,'x','W');
+	cubes[5]->Mat.UpdateView('a',-0.42, 0.0 ,-0.42,'x','W');
+	cubes[4]->Mat.UpdateView('a',-0.42, 0.42,-0.42,'x','W');
 
-	cubos[14]->Mat.UpdateView('a',0.0,-0.42,-0.42,'x','W');
-	cubos[13]->Mat.UpdateView('a',0.0, 0.0 ,-0.42,'x','W');
-	cubos[12]->Mat.UpdateView('a',0.0, 0.42,-0.42,'x','W');
+	cubes[14]->Mat.UpdateView('a',0.0,-0.42,-0.42,'x','W');
+	cubes[13]->Mat.UpdateView('a',0.0, 0.0 ,-0.42,'x','W');
+	cubes[12]->Mat.UpdateView('a',0.0, 0.42,-0.42,'x','W');
 
-	cubos[22]->Mat.UpdateView('a',0.42,-0.42,-0.42,'x','W');
-	cubos[21]->Mat.UpdateView('a',0.42, 0.0 ,-0.42,'x','W');
-	cubos[20]->Mat.UpdateView('a',0.42, 0.42,-0.42,'x','W');
+	cubes[22]->Mat.UpdateView('a',0.42,-0.42,-0.42,'x','W');
+	cubes[21]->Mat.UpdateView('a',0.42, 0.0 ,-0.42,'x','W');
+	cubes[20]->Mat.UpdateView('a',0.42, 0.42,-0.42,'x','W');
 
 	// DUMMY centrado en el medio
 	
 	// front - green
 	// left - orange
-	// orange - yellow
-	
-	// TODO: change orientazions??
+	// up - yellow
 
 	// Camada CH1 - bottom
-	camada_verts[0]={
+	horizontal_set[0]={
 		// mini-Ch1
-		cubos[0],cubos[7],cubos[6],
+		cubes[6],cubes[7],cubes[0],
 		// mini-Ch2
-		cubos[8],cubos[15],cubos[14],
+		cubes[14],cubes[15],cubes[8],
 		// mini-Ch3
-		cubos[16],cubos[23],cubos[22]
+		cubes[22],cubes[23],cubes[16]
 	};
 
 	// Camada CH2 - mid
-	camada_verts[1]={
+	horizontal_set[1]={
 		// mini-Ch1
-		cubos[1],cubos[25],cubos[5],
+		cubes[5],cubes[25],cubes[1],
 		// mini-Ch2
-		cubos[9],cubos[26],cubos[13],
+		cubes[13],cubes[26],cubes[9],
 		// mini-Ch3
-		cubos[17],cubos[24],cubos[21]
+		cubes[21],cubes[24],cubes[17]
 	};
 
 	// Camada CH3 - up
-	camada_verts[2]={
+	horizontal_set[2]={
 		// mini-Ch1
-		cubos[2],cubos[3],cubos[4],
+		cubes[4],cubes[3],cubes[2],
 		// mini-Ch2
-		cubos[10],cubos[11],cubos[12],
+		cubes[12],cubes[11],cubes[10],
 		// mini-Ch3
-		cubos[18],cubos[19],cubos[20]
+		cubes[20],cubes[19],cubes[18]
 	};
 	
 	// Camada CV1 - left
-	camada_horits[0] = {
+	vertical_set[0]={
 		// mini-Cv1
-		cubos[0],cubos[7],cubos[6],
+		cubes[0],cubes[7],cubes[6],
 		// mini-Cv2
-		cubos[1],cubos[25],cubos[5],
+		cubes[1],cubes[25],cubes[5],
 		// mini-Cv3
-		cubos[2],cubos[3],cubos[4]
+		cubes[2],cubes[3],cubes[4]
 	};
 	
 	// Camada CV2 - mid
-	camada_horits[1]={
+	vertical_set[1]={
 		// mini-Cv1
-		cubos[8],cubos[15],cubos[14],
+		cubes[8],cubes[15],cubes[14],
 		// mini-Cv2
-		cubos[9],cubos[26],cubos[13],
+		cubes[9],cubes[26],cubes[13],
 		// mini-Cv3
-		cubos[10],cubos[11],cubos[12]
+		cubes[10],cubes[11],cubes[12]
 	};
 	
 	// Camada CV3 - right
-	camada_horits[2]={
+	vertical_set[2]={
 		// mini-Cv1
-		cubos[16],cubos[23],cubos[22],
+		cubes[16],cubes[23],cubes[22],
 		// mini-Cv2
-		cubos[17],cubos[24],cubos[21],
+		cubes[17],cubes[24],cubes[21],
 		// mini-Cv3
-		cubos[18],cubos[19],cubos[20]
+		cubes[18],cubes[19],cubes[20]
 	};
 	
 	// Camada CP1 - front
-	camada_prof[0]={
+	deep_set[0]={
 		// mini-CP1
-		cubos[0],cubos[1],cubos[2],
+		cubes[16],cubes[8],cubes[0],
 		// mini-CP2
-		cubos[8],cubos[9],cubos[10],
+		cubes[17],cubes[9],cubes[1],
 		// mini-CP3
-		cubos[16],cubos[17],cubos[18],
+		cubes[18],cubes[10],cubes[2],
 	};
 	
 	// Camada CP2 - mid
-	camada_prof[1]={
+	deep_set[1]={
 		// mini-CP1
-		cubos[7],cubos[25],cubos[3],
+		cubes[23],cubes[15],cubes[7],
 		// mini-CP2
-		cubos[15],cubos[26],cubos[11],
+		cubes[24],cubes[26],cubes[25],
 		// mini-CP3
-		cubos[23],cubos[24],cubos[19],
+		cubes[19],cubes[11],cubes[3],
 	};
 	
 	// Camada CP2 - back
-	camada_prof[2]={
+	deep_set[2]={
 		// mini-CP1
-		cubos[6],cubos[5],cubos[4],
+		cubes[22],cubes[14],cubes[6],
 		// mini-CP2
-		cubos[14],cubos[13],cubos[12],
+		cubes[21],cubes[13],cubes[5],
 		// mini-CP3
-		cubos[22],cubos[21],cubos[20],
+		cubes[20],cubes[12],cubes[4],
 	};
 }
 
-void Rubik::Permutation_horaria(std::vector<Cube*> &cam){ // horario
+void Rubik::clockwise_permutation(std::vector<Cube*> &cam){ // horario
 	std::vector<Cube*> tmp=cam;
-	
 	cam[2]=tmp[0];
 	cam[5]=tmp[1];
 	cam[8]=tmp[2];
@@ -213,9 +222,8 @@ void Rubik::Permutation_horaria(std::vector<Cube*> &cam){ // horario
 	cam[6]=tmp[8];
 }
 
-void Rubik::Permutation_antihoraria(std::vector<Cube*> &cam){ // antihorario
+void Rubik::counterClockwise_permutation(std::vector<Cube*> &cam){ // antihorario
 	std::vector<Cube*> tmp=cam;
-
 	cam[6]=tmp[0];
 	cam[3]=tmp[1];
 	cam[0]=tmp[2];
@@ -242,84 +250,84 @@ void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_cha
 }
 */
 // deep and vertical
-void Rubik::sync_from_hori(int v) {
+void Rubik::sync_from_horizontal(int h_idx) {
+    for(int v = 0; v < 3; v++) {
+        for(int d = 0; d < 3; d++) {
+            Cube* c = horizontal_set[h_idx][v * 3 + (2 - d)]; 
+            vertical_set[v][h_idx * 3 + d] = c;
+            deep_set[d][h_idx * 3 + (2 - v)] = c;
+        }
+    }
+}
+
+// deep and horizontal
+void Rubik::sync_from_vertical(int v_idx) {
     for(int h = 0; h < 3; h++) {
-        for(int p = 0; p < 3; p++) {
-            Cube* c = camada_horits[v][h*3 + p];
-            camada_verts[h][v*3 + p] = c;
-            camada_prof[p][v*3 + h] = c;
+        for(int d = 0; d < 3; d++) {
+            Cube* c = vertical_set[v_idx][h * 3 + d];
+            horizontal_set[h][v_idx * 3 + (2 - d)] = c;
+            deep_set[d][h * 3 + (2 - v_idx)] = c;
         }
     }
 }
 
-// deep or horizontal
-void Rubik::sync_from_verti(int h) {
-    for(int v = 0; v < 3; v++) {
-        for(int p = 0; p < 3; p++) {
-            Cube* c = camada_verts[h][v*3 + p];
-            camada_horits[v][h*3 + p] = c;
-            camada_prof[p][v*3 + h] = c;
+// vertical and horizontal
+void Rubik::sync_from_deep(int d_idx) {
+    for(int h = 0; h < 3; h++) {
+        for(int v = 0; v < 3; v++) {
+            Cube* c = deep_set[d_idx][h * 3 + (2 - v)];
+            horizontal_set[h][v * 3 + (2 - d_idx)] = c;
+            vertical_set[v][h * 3 + d_idx] = c;
         }
     }
 }
 
-// vertical or horizontal
-void Rubik::sync_from_prof(int p) {
-    for(int v = 0; v < 3; v++) {
-        for(int h = 0; h < 3; h++) {
-            Cube* c = camada_prof[p][v*3 + h];
-            camada_horits[v][h*3 + p] = c;
-            camada_verts[h][v*3 + p] = c;
-        }
-    }
-}
-
-void Rubik::Rotation_hori(float value_rot,int option,Animator* &anim){
+void Rubik::horizontal_rotation(float value_rot,int option,Animator* &anim){
 	if(!anim->animations.empty())
         return;
 	if(do_permutation)
 		return;
 	if(option <= 0 || option > 3){
+		std::cout << "Opcion de rotacion vertical invalida :( " << std::endl;
+		return;
+	}
+	
+	std::vector<Animation_Step*> steps;
+	for(auto* cube : horizontal_set[option-1]){
+		steps.push_back(new Animation_Step(cube, 0.2f, 'd', value_rot, 'y', 'W'));
+	}
+	anim->Add_Animations(steps, 'N');
+	
+	do_permutation = true;
+    permutation_option = option;
+    permutation_axi = 1;
+	permutation_clockwise = (value_rot > 0);
+}
+
+void Rubik::vertical_rotation(float value_rot,int option,Animator* &anim){
+	if(!anim->animations.empty())
+        return;
+	if(do_permutation)
+		return;
+	if(option <= 3 || option > 6){
 		std::cout << "Opcion de rotacion horizontal invalida :( " << std::endl;
 		return;
 	}
 	
 	std::vector<Animation_Step*> steps;
 
-	for(auto* cube : camada_horits[option-1]){
-		steps.push_back(new Animation_Step(cube, 0.3f, 'd', value_rot, 'x', 'W'));
+	for(auto* cube : vertical_set[option-4]){
+		steps.push_back(new Animation_Step(cube, 0.2f, 'd', value_rot, 'x', 'W'));
 	}
 	anim->Add_Animations(steps, 'N');
 
 	do_permutation = true;
-    perm_option = option;
-    perm_eje = 1;
-	perm_direccion_horaria = (value_rot > 0);
+    permutation_option = option;
+    permutation_axi = 2;
+	permutation_clockwise = (value_rot > 0);
 }
 
-void Rubik::Rotation_verti(float value_rot,int option,Animator* &anim){
-	if(!anim->animations.empty())
-        return;
-	if(do_permutation)
-		return;
-	if(option <= 3 || option > 6){
-		std::cout << "Opcion de rotacion vertical invalida :( " << std::endl;
-		return;
-	}
-	
-	std::vector<Animation_Step*> steps;
-	for(auto* cube : camada_verts[option-4]){
-		steps.push_back(new Animation_Step(cube, 0.3f, 'd', value_rot, 'y', 'W'));
-	}
-	anim->Add_Animations(steps, 'N');
-	
-	do_permutation = true;
-    perm_option = option;
-    perm_eje = 2;
-	perm_direccion_horaria = (value_rot > 0);
-}
-
-void Rubik::Rotation_prof(float value_rot,int option,Animator* &anim){
+void Rubik::deep_rotation(float value_rot,int option,Animator* &anim){
 	if(!anim->animations.empty())
         return;
 	if(do_permutation)
@@ -330,15 +338,15 @@ void Rubik::Rotation_prof(float value_rot,int option,Animator* &anim){
 	}
 	
 	std::vector<Animation_Step*> steps;
-	for(auto* cube : camada_prof[option-7]){
-		steps.push_back(new Animation_Step(cube, 0.3f, 'd', value_rot, 'z', 'W'));
+	for(auto* cube : deep_set[option-7]){
+		steps.push_back(new Animation_Step(cube, 0.2f, 'd', value_rot, 'z', 'W'));
 	}
 	anim->Add_Animations(steps, 'N');
 	
 	do_permutation = true;
-    perm_option = option;
-    perm_eje = 3;
-	perm_direccion_horaria = (value_rot > 0);
+    permutation_option = option;
+    permutation_axi = 3;
+	permutation_clockwise = (value_rot > 0);
 }
 
 void Rubik::handleKey(int key, int mods,char CURRENT_AXIS){
@@ -398,48 +406,48 @@ void Rubik::handleKey(int key, int mods,char CURRENT_AXIS){
 }
 
 void Rubik::printMenu(){
-	std::cout << "===================================" << std::endl;
-    std::cout << "|        Bienvenido a             |" << std::endl;
-    std::cout << "|     Simulador de Rubik          |" << std::endl;
-    std::cout << "|                                 |" << std::endl;
-    std::cout << "|  1. Mover Camada Hori 1         |" << std::endl;
-    std::cout << "|  2. Mover Camada Hori 2         |" << std::endl;
-    std::cout << "|  3. Mover Camada Hori 3         |" << std::endl;
-	std::cout << "|  4. Mover Camada Verti 1        |" << std::endl;
-	std::cout << "|  5. Mover Camada Verti 2        |" << std::endl;
-	std::cout << "|  6. Mover Camada Verti 3        |" << std::endl;
-	std::cout << "|  7. Mover Camada Prof  1        |" << std::endl;
-	std::cout << "|  8. Mover Camada Prof  2        |" << std::endl;
-	std::cout << "|  9. Mover Camada Prof  3        |" << std::endl;
-	std::cout << "|  A. Animacion horizontal        |" << std::endl;
-	std::cout << "|  S. Animacion vertical          |" << std::endl;
-	std::cout << "|  Q. Animacion de camadas        |" << std::endl;
-    std::cout << "|  ESC/CTRL+C. Salir              |" << std::endl;
-    std::cout << "===================================" << std::endl;
+	std::cout << "=======================================" << std::endl;
+    std::cout << "|           Bienvenido a              |" << std::endl;
+    std::cout << "|        Simulador de Rubik           |" << std::endl;
+    std::cout << "|                                     |" << std::endl;
+    std::cout << "|     1. Mover Camada Horizontal 1    |" << std::endl;
+    std::cout << "|     2. Mover Camada Horizontal 2    |" << std::endl;
+    std::cout << "|     3. Mover Camada Horizontal 3    |" << std::endl;
+	std::cout << "|     4. Mover Camada Vertical 1      |" << std::endl;
+	std::cout << "|     5. Mover Camada Vertical 2      |" << std::endl;
+	std::cout << "|     6. Mover Camada Vertical 3      |" << std::endl;
+	std::cout << "|     7. Mover Camada Profunda 1      |" << std::endl;
+	std::cout << "|     8. Mover Camada Profunda 2      |" << std::endl;
+	std::cout << "|     9. Mover Camada Profunda 3      |" << std::endl;
+	std::cout << "|     A. Animacion horizontal         |" << std::endl;
+	std::cout << "|     S. Animacion vertical           |" << std::endl;
+	std::cout << "|     Q. Animacion de camadas         |" << std::endl;
+    std::cout << "|     ESC/CTRL+C. Salir               |" << std::endl;
+    std::cout << "=======================================" << std::endl;
 }
 
 void Rubik::PrintCamadas(){
 	std::cout << "-------------------------------" << std::endl;
 	std::cout << " PARA CAMADAS VERTICALES " << std::endl;
-	for(int i=0;i<camada_verts.size();i++){
+	for(int i=0;i<horizontal_set.size();i++){
 		std::cout << "Camada vertical -> " << i << std::endl;
-		for(int j=0;j<camada_verts[i].size();j++){
-			std::cout << "Cubo # " << camada_verts[i][j]->name << std::endl;
+		for(int j=0;j<horizontal_set[i].size();j++){
+			std::cout << "Cubo # " << horizontal_set[i][j]->name << std::endl;
 		}
 	}
 	std::cout << " PARA CAMADAS HORIZONTAL " << std::endl;
-	for(int i=0;i<camada_horits.size();i++){
+	for(int i=0;i<vertical_set.size();i++){
 		std::cout << "Camada horizontal -> " << i << std::endl;
-		for(int j=0;j<camada_horits[i].size();j++){
-			std::cout << "Cubo # " << camada_horits[i][j]->name << std::endl;
+		for(int j=0;j<vertical_set[i].size();j++){
+			std::cout << "Cubo # " << vertical_set[i][j]->name << std::endl;
 		}
 	}
 	
 	std::cout << " PARA CAMADAS PROFUNDAS " << std::endl;
-	for(int i=0;i<camada_prof.size();i++){
+	for(int i=0;i<deep_set.size();i++){
 		std::cout << "Camada horizontal -> " << i << std::endl;
-		for(int j=0;j<camada_prof[i].size();j++){
-			std::cout << "Cubo # " << camada_prof[i][j]->name << std::endl;
+		for(int j=0;j<deep_set[i].size();j++){
+			std::cout << "Cubo # " << deep_set[i][j]->name << std::endl;
 		}
 	}
 	std::cout << "-------------------------------" << std::endl;

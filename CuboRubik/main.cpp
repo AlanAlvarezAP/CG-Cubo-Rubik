@@ -315,7 +315,7 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 		case GLFW_KEY_3:{
 			if(mundito->activeSceneNode==rubik){
 				float angle = (mods & GLFW_MOD_SHIFT) ? -90.0f : 90.0f;
-				rubik->Rotation_hori(angle,key-GLFW_KEY_0,anim);
+				rubik->horizontal_rotation(angle,key-GLFW_KEY_0,anim);
 			}else{
 				std::cout << "No es rubiks no se puede mover" << std::endl;
 			}
@@ -326,7 +326,7 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 		case GLFW_KEY_6:{
 			if(mundito->activeSceneNode==rubik){
 				float angle = (mods & GLFW_MOD_SHIFT) ? -90.0f : 90.0f;
-				rubik->Rotation_verti(angle,key-GLFW_KEY_0,anim);
+				rubik->vertical_rotation(angle,key-GLFW_KEY_0,anim);
 			}else{
 				std::cout << "No es rubiks no se puede mover" << std::endl;
 			}
@@ -337,7 +337,7 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 		case GLFW_KEY_9:{
 			if(mundito->activeSceneNode==rubik){
 				float angle = (mods & GLFW_MOD_SHIFT) ? -90.0f : 90.0f;
-				rubik->Rotation_prof(angle,key-GLFW_KEY_0,anim);
+				rubik->deep_rotation(angle,key-GLFW_KEY_0,anim);
 			}else{
 				std::cout << "No es rubiks no se puede mover" << std::endl;
 			}
@@ -498,33 +498,27 @@ int main(){
 		glfwPollEvents();
 		anim->Execute_animations(dt);
 		if(anim->animations.empty() && rubik->do_permutation){
-			if(rubik->perm_eje==1){ // horizontal
-				int h = rubik->perm_option - 1;
-				//std::cout << ">>> PERMUTANDO HORIZONTAL | h: " << h << " | size: " << rubik->camada_horits[h].size() << std::endl;
-				if(rubik->perm_direccion_horaria)
-					rubik->Permutation_horaria(rubik->camada_horits[h]);
+			if(rubik->permutation_axi==1){ // horizontal
+				int h = rubik->permutation_option - 1;
+				if(rubik->permutation_clockwise)
+					rubik->clockwise_permutation(rubik->horizontal_set[h]);
 				else
-					rubik->Permutation_antihoraria(rubik->camada_horits[h]);
-				//rubik->Update_contrary(rubik->perm_option,1,rubik->camada_horits[rubik->perm_option-1],rubik->camada_verts);
-				rubik->sync_from_hori(h);
-			} else if(rubik->perm_eje==2) {
-				int v = rubik->perm_option - 4;
-				//std::cout << ">>> PERMUTANDO VERTICAL | v: " << v << " | size: " << rubik->camada_verts[v].size() << std::endl;
-				if(rubik->perm_direccion_horaria)
-					rubik->Permutation_antihoraria(rubik->camada_verts[v]);
+					rubik->counterClockwise_permutation(rubik->horizontal_set[h]);
+				rubik->sync_from_horizontal(h);
+			} else if(rubik->permutation_axi==2) { // vertical
+				int v = rubik->permutation_option - 4;
+				if(rubik->permutation_clockwise)
+					rubik->clockwise_permutation(rubik->vertical_set[v]);
 				else
-					rubik->Permutation_horaria(rubik->camada_verts[v]);
-				//rubik->Update_contrary(rubik->perm_option,4,rubik->camada_verts[rubik->perm_option-4],rubik->camada_horits);
-				rubik->sync_from_verti(v);
-			} else if(rubik->perm_eje==3) {
-				int p = rubik->perm_option - 7;
-				//std::cout << ">>> PERMUTANDO PROFUNDA | p: " << p << " | size: " << rubik->camada_prof[p].size() << std::endl;
-				if(rubik->perm_direccion_horaria)
-					rubik->Permutation_antihoraria(rubik->camada_prof[p]);
+					rubik->counterClockwise_permutation(rubik->vertical_set[v]);
+				rubik->sync_from_vertical(v);
+			} else if(rubik->permutation_axi==3) { // deep
+				int p = rubik->permutation_option - 7;
+				if(rubik->permutation_clockwise)
+					rubik->counterClockwise_permutation(rubik->deep_set[p]);
 				else
-					rubik->Permutation_horaria(rubik->camada_prof[p]);
-				//rubik->Update_contrary(rubik->perm_option,7,rubik->camada_prof[rubik->perm_option-7],rubik->camada_prof);
-				rubik->sync_from_prof(p);
+					rubik->clockwise_permutation(rubik->deep_set[p]);
+				rubik->sync_from_deep(p);
 			}
 			rubik->do_permutation = false;
 			//rubik->PrintCamadas();
@@ -535,9 +529,9 @@ int main(){
 			Movement mov = rubikAnimations.front();
 			rubikAnimations.pop();
 			if(mov.type == 'h')
-				rubik->Rotation_hori(mov.angle, mov.layer, anim);
+				rubik->horizontal_rotation(mov.angle, mov.layer, anim);
 			else if(mov.type == 'v')
-				rubik->Rotation_verti(mov.angle, mov.layer, anim);
+				rubik->vertical_rotation(mov.angle, mov.layer, anim);
 		}
 		
 		// Para seguir

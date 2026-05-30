@@ -23,7 +23,8 @@ enum Colors{
 	GRIS
 };
 
-struct RGB{
+class RGB{
+public:
 	float r;
 	float g;
 	float b;
