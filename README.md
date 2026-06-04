@@ -25,4 +25,4 @@ Repositorio para el primer proyecto grupal del curso de Computación Grafica Cco
    - [x] Definición de Solver
    - [x] Resolución de movimiento centro
    - [x] Implementación Solver
-   - [ ] Animación de shuffle y solver
+   - [x] Animación de shuffle y solver
