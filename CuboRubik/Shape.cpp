@@ -1,6 +1,6 @@
 #include "Shape.h"
-#include "Pizza.h"
-#include "Piramid.h"
+/////#include "Pizza.h"
+//#include "Piramid.h"
 
 #include <glad/gl.h>
 #define GLFW_INCLUDE_NONE

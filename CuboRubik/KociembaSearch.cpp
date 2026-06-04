@@ -152,23 +152,35 @@ CubieCube KociembaSolver::faceletsToCubie(const std::string& f) {
         int col1 = f[edgeFacelet[i][0]] - '0';
         int col2 = f[edgeFacelet[i][1]] - '0';
         int ori = 0;
+        int perm = -1;
         
         // Edge orientation check (simple way: U/D colors are always dominant)
         // For E slice (FR, FL, BL, BR), F/B colors are dominant over R/L
-        bool c1Dominant = (col1 == 0 || col1 == 3 || (i >= 8 && (col1 == 2 || col1 == 5)));
-        bool c2Dominant = (col2 == 0 || col2 == 3 || (i >= 8 && (col2 == 2 || col2 == 5)));
+        //bool c1Dominant = (col1 == 0 || col1 == 3 || (i >= 8 && (col1 == 2 || col1 == 5)));
+        //bool c2Dominant = (col2 == 0 || col2 == 3 || (i >= 8 && (col2 == 2 || col2 == 5)));
         
-        if (c2Dominant) {
-            ori = 1;
-            std::swap(col1, col2);
-        }
+        //if (c2Dominant) {
+        //    ori = 1;
+        //    std::swap(col1, col2);
+        //}
         
-        int perm = -1;
+        //for (int j = 0; j < 12; j++) {
+        //    if (col1 == edgeColor[j][0] && col2 == edgeColor[j][1]) {
+        //        perm = j; break;
+        //    }
+        //}
         for (int j = 0; j < 12; j++) {
             if (col1 == edgeColor[j][0] && col2 == edgeColor[j][1]) {
-                perm = j; break;
+                perm = j;
+                ori = 0; // normal
+                break;
+            } else if (col1 == edgeColor[j][1] && col2 == edgeColor[j][0]) {
+                perm = j;
+                ori = 1; // flipped
+                break;
             }
         }
+
         if (perm == -1) throw InvalidCubeStateException("Invalid edge");
         cc.ep[i] = perm;
         cc.eo[i] = ori;

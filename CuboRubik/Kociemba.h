@@ -1,5 +1,4 @@
-#ifndef KOCIEMBA_H
-#define KOCIEMBA_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -70,5 +69,3 @@ class InvalidCubeStateException : public std::runtime_error {
 public:
     InvalidCubeStateException(const std::string& msg) : std::runtime_error(msg) {}
 };
-
-#endif

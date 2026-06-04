@@ -10,7 +10,28 @@ Rubik::Rubik(World* world,const Point &center) :
 	do_permutation(false),
 	permutation_option(0),
 	permutation_axi(1)
-	{}
+	{
+		animation_time = 0.25f;
+		/*
+		for(int i = 0; i < 9; i++) {
+			facelets[i] = '0'; // UP
+			facelets[i + 9] = '1'; // RIGHT
+			facelets[i + 18] = '2'; // FRONT
+			facelets[i + 27] = '3'; // DOWN
+			facelets[i + 36] = '4'; // LEFT
+			facelets[i + 45] = '5'; // BACK
+		}
+		*/
+		for(int i = 0; i < 9; i++) {
+			facelets[i] = 'U';
+			facelets[i + 9] = 'R';
+			facelets[i + 18] = 'F';
+			facelets[i + 27] = 'D';
+			facelets[i + 36] = 'L';
+			facelets[i + 45] = 'B';
+		}
+		facelets[54]='\0';
+	}
 
 // Camadas
 // Horizontal -> 0
@@ -62,7 +83,7 @@ void Rubik::Generate() {
 	};
 	
 	for(int i=0;i<27;i++){
-		Cube* tmp=new Cube(this->world,{0.0f,0.0f,0.0f},rubikColors[i],types[i],std::string{"Cube"+std::to_string(i)});
+		Cubee* tmp=new Cubee(this->world,{0.0f,0.0f,0.0f},rubikColors[i],types[i],std::string{"Cubee"+std::to_string(i)});
 		tmp->Generate();
 		cubes.push_back(tmp);
 		this->AddChildren(tmp);
@@ -210,8 +231,8 @@ void Rubik::Generate() {
 	};
 }
 
-void Rubik::clockwise_permutation(std::vector<Cube*> &cam){ // horario
-	std::vector<Cube*> tmp=cam;
+void Rubik::clockwise_permutation(std::vector<Cubee*> &cam){ // horario
+	std::vector<Cubee*> tmp=cam;
 	cam[2]=tmp[0];
 	cam[5]=tmp[1];
 	cam[8]=tmp[2];
@@ -222,8 +243,8 @@ void Rubik::clockwise_permutation(std::vector<Cube*> &cam){ // horario
 	cam[6]=tmp[8];
 }
 
-void Rubik::counterClockwise_permutation(std::vector<Cube*> &cam){ // antihorario
-	std::vector<Cube*> tmp=cam;
+void Rubik::counterClockwise_permutation(std::vector<Cubee*> &cam){ // antihorario
+	std::vector<Cubee*> tmp=cam;
 	cam[6]=tmp[0];
 	cam[3]=tmp[1];
 	cam[0]=tmp[2];
@@ -234,7 +255,7 @@ void Rubik::counterClockwise_permutation(std::vector<Cube*> &cam){ // antihorari
 	cam[2]=tmp[8];
 }
 /*
-void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_changed,std::vector<std::vector<Cube*>> &camadas){
+void Rubik::Update_contrary(int option,int offset,std::vector<Cubee*> &camada_changed,std::vector<std::vector<Cubee*>> &camadas){
 	int block=option-offset;
 	for(int i=0;i<camadas.size();i++){ 
 		auto& row=camadas[i];
@@ -253,7 +274,7 @@ void Rubik::Update_contrary(int option,int offset,std::vector<Cube*> &camada_cha
 void Rubik::sync_from_horizontal(int h_idx) {
     for(int v = 0; v < 3; v++) {
         for(int d = 0; d < 3; d++) {
-            Cube* c = horizontal_set[h_idx][v * 3 + (2 - d)]; 
+            Cubee* c = horizontal_set[h_idx][v * 3 + (2 - d)]; 
             vertical_set[v][h_idx * 3 + d] = c;
             deep_set[d][h_idx * 3 + (2 - v)] = c;
         }
@@ -264,7 +285,7 @@ void Rubik::sync_from_horizontal(int h_idx) {
 void Rubik::sync_from_vertical(int v_idx) {
     for(int h = 0; h < 3; h++) {
         for(int d = 0; d < 3; d++) {
-            Cube* c = vertical_set[v_idx][h * 3 + d];
+            Cubee* c = vertical_set[v_idx][h * 3 + d];
             horizontal_set[h][v_idx * 3 + (2 - d)] = c;
             deep_set[d][h * 3 + (2 - v_idx)] = c;
         }
@@ -275,7 +296,7 @@ void Rubik::sync_from_vertical(int v_idx) {
 void Rubik::sync_from_deep(int d_idx) {
     for(int h = 0; h < 3; h++) {
         for(int v = 0; v < 3; v++) {
-            Cube* c = deep_set[d_idx][h * 3 + (2 - v)];
+            Cubee* c = deep_set[d_idx][h * 3 + (2 - v)];
             horizontal_set[h][v * 3 + (2 - d_idx)] = c;
             vertical_set[v][h * 3 + d_idx] = c;
         }
@@ -293,15 +314,16 @@ void Rubik::horizontal_rotation(float value_rot,int option,Animator* &anim){
 	}
 	
 	std::vector<Animation_Step*> steps;
-	for(auto* cube : horizontal_set[option-1]){
-		steps.push_back(new Animation_Step(cube, 0.2f, 'd', value_rot, 'y', 'W'));
-	}
+	for(auto* cube : horizontal_set[option-1])
+		steps.push_back(new Animation_Step(cube, animation_time, 'd', value_rot, 'y', 'W'));
 	anim->Add_Animations(steps, 'N');
 	
 	do_permutation = true;
     permutation_option = option;
     permutation_axi = 1;
 	permutation_clockwise = (value_rot > 0);
+
+	update_facelets_from_horizontal(option-1);
 }
 
 void Rubik::vertical_rotation(float value_rot,int option,Animator* &anim){
@@ -315,16 +337,16 @@ void Rubik::vertical_rotation(float value_rot,int option,Animator* &anim){
 	}
 	
 	std::vector<Animation_Step*> steps;
-
-	for(auto* cube : vertical_set[option-4]){
-		steps.push_back(new Animation_Step(cube, 0.2f, 'd', value_rot, 'x', 'W'));
-	}
+	for(auto* cube : vertical_set[option-4])
+		steps.push_back(new Animation_Step(cube, animation_time, 'd', value_rot, 'x', 'W'));
 	anim->Add_Animations(steps, 'N');
 
 	do_permutation = true;
     permutation_option = option;
     permutation_axi = 2;
 	permutation_clockwise = (value_rot > 0);
+
+	update_facelets_from_vertical(option-4);
 }
 
 void Rubik::deep_rotation(float value_rot,int option,Animator* &anim){
@@ -338,23 +360,169 @@ void Rubik::deep_rotation(float value_rot,int option,Animator* &anim){
 	}
 	
 	std::vector<Animation_Step*> steps;
-	for(auto* cube : deep_set[option-7]){
-		steps.push_back(new Animation_Step(cube, 0.2f, 'd', value_rot, 'z', 'W'));
-	}
+	for(auto* cube : deep_set[option-7])
+		steps.push_back(new Animation_Step(cube, animation_time, 'd', value_rot, 'z', 'W'));
 	anim->Add_Animations(steps, 'N');
 	
 	do_permutation = true;
     permutation_option = option;
     permutation_axi = 3;
 	permutation_clockwise = (value_rot > 0);
+
+	update_facelets_from_deep(option-7);
+}
+
+void Rubik::update_facelets_from_horizontal(int idx) {
+    char tmp[54];
+    for(int i = 0; i < 54; i++) tmp[i] = facelets[i];
+
+    bool cw = permutation_clockwise;
+
+    auto rotate_face = [&](int base, bool is_cw) {
+        if (is_cw) {
+            facelets[base+0]=tmp[base+6]; facelets[base+1]=tmp[base+3]; facelets[base+2]=tmp[base+0];
+            facelets[base+3]=tmp[base+7]; facelets[base+4]=tmp[base+4]; facelets[base+5]=tmp[base+1];
+            facelets[base+6]=tmp[base+8]; facelets[base+7]=tmp[base+5]; facelets[base+8]=tmp[base+2];
+        } else {
+            facelets[base+0]=tmp[base+2]; facelets[base+1]=tmp[base+5]; facelets[base+2]=tmp[base+8];
+            facelets[base+3]=tmp[base+1]; facelets[base+4]=tmp[base+4]; facelets[base+5]=tmp[base+7];
+            facelets[base+6]=tmp[base+0]; facelets[base+7]=tmp[base+3]; facelets[base+8]=tmp[base+6];
+        }
+    };
+
+    auto rotate_ring = [&](const int r1[3], const int r2[3], const int r3[3], const int r4[3], bool is_cw) {
+        if (is_cw) {
+            for(int i=0; i<3; i++) {
+                facelets[r2[i]]=tmp[r1[i]]; facelets[r3[i]]=tmp[r2[i]];
+                facelets[r4[i]]=tmp[r3[i]]; facelets[r1[i]]=tmp[r4[i]];
+            }
+        } else {
+            for(int i=0; i<3; i++) {
+                facelets[r4[i]]=tmp[r1[i]]; facelets[r3[i]]=tmp[r4[i]];
+                facelets[r2[i]]=tmp[r3[i]]; facelets[r1[i]]=tmp[r2[i]];
+            }
+        }
+    };
+
+    if (idx == 0) { // Down - face 27
+        const int r1[3]={24,25,26}, r2[3]={15,16,17}, r3[3]={51,52,53}, r4[3]={42,43,44};
+        rotate_ring(r1, r2, r3, r4, cw);
+        rotate_face(27, cw);
+    } 
+    else if (idx == 1) { // Mid (E)
+        const int r1[3]={21,22,23}, r2[3]={12,13,14}, r3[3]={48,49,50}, r4[3]={39,40,41};
+        rotate_ring(r1, r2, r3, r4, cw);
+    } 
+    else if (idx == 2) { // Up - face 0
+        const int r1[3]={18,19,20}, r2[3]={9,10,11}, r3[3]={45,46,47}, r4[3]={36,37,38};
+        rotate_ring(r1, r2, r3, r4, cw);
+        rotate_face(0, !cw); // opuesto
+    }
+}
+
+void Rubik::update_facelets_from_vertical(int idx) {
+    char tmp[54];
+    for(int i = 0; i < 54; i++) tmp[i] = facelets[i];
+
+    bool cw = permutation_clockwise;
+
+    auto rotate_face = [&](int base, bool is_cw) {
+        if (is_cw) {
+            facelets[base+0]=tmp[base+6]; facelets[base+1]=tmp[base+3]; facelets[base+2]=tmp[base+0];
+            facelets[base+3]=tmp[base+7]; facelets[base+4]=tmp[base+4]; facelets[base+5]=tmp[base+1];
+            facelets[base+6]=tmp[base+8]; facelets[base+7]=tmp[base+5]; facelets[base+8]=tmp[base+2];
+        } else {
+            facelets[base+0]=tmp[base+2]; facelets[base+1]=tmp[base+5]; facelets[base+2]=tmp[base+8];
+            facelets[base+3]=tmp[base+1]; facelets[base+4]=tmp[base+4]; facelets[base+5]=tmp[base+7];
+            facelets[base+6]=tmp[base+0]; facelets[base+7]=tmp[base+3]; facelets[base+8]=tmp[base+6];
+        }
+    };
+
+    auto rotate_ring = [&](const int r1[3], const int r2[3], const int r3[3], const int r4[3], bool is_cw) {
+        if (is_cw) {
+            for(int i=0; i<3; i++) {
+                facelets[r2[i]]=tmp[r1[i]]; facelets[r3[i]]=tmp[r2[i]];
+                facelets[r4[i]]=tmp[r3[i]]; facelets[r1[i]]=tmp[r4[i]];
+            }
+        } else {
+            for(int i=0; i<3; i++) {
+                facelets[r4[i]]=tmp[r1[i]]; facelets[r3[i]]=tmp[r4[i]];
+                facelets[r2[i]]=tmp[r3[i]]; facelets[r1[i]]=tmp[r2[i]];
+            }
+        }
+    };
+
+    if (idx == 0) { // Left - face 36
+        const int r1[3]={0,3,6}, r2[3]={18,21,24}, r3[3]={27,30,33}, r4[3]={53,50,47};
+        rotate_ring(r1, r2, r3, r4, cw);
+        rotate_face(36, cw);
+    } 
+    else if (idx == 1) { // Mid (M)
+        const int r1[3]={1,4,7}, r2[3]={19,22,25}, r3[3]={28,31,34}, r4[3]={52,49,46};
+		//printf("\ntest M movement\n");
+        //const int r4[3]={46,49,52};
+        rotate_ring(r1, r2, r3, r4, cw);
+    } 
+    else if (idx == 2) { // Right - face 9
+        const int r1[3]={2,5,8}, r2[3]={20,23,26}, r3[3]={29,32,35}, r4[3]={51,48,45};
+        rotate_ring(r1, r2, r3, r4, cw);
+        rotate_face(9, !cw); 
+    }
+}
+
+void Rubik::update_facelets_from_deep(int idx) {
+    char tmp[54];
+    for(int i = 0; i < 54; i++) tmp[i] = facelets[i];
+
+    bool cw = permutation_clockwise;
+
+    auto rotate_face = [&](int base, bool is_cw) {
+        if (is_cw) {
+            facelets[base+0]=tmp[base+6]; facelets[base+1]=tmp[base+3]; facelets[base+2]=tmp[base+0];
+            facelets[base+3]=tmp[base+7]; facelets[base+4]=tmp[base+4]; facelets[base+5]=tmp[base+1];
+            facelets[base+6]=tmp[base+8]; facelets[base+7]=tmp[base+5]; facelets[base+8]=tmp[base+2];
+        } else {
+            facelets[base+0]=tmp[base+2]; facelets[base+1]=tmp[base+5]; facelets[base+2]=tmp[base+8];
+            facelets[base+3]=tmp[base+1]; facelets[base+4]=tmp[base+4]; facelets[base+5]=tmp[base+7];
+            facelets[base+6]=tmp[base+0]; facelets[base+7]=tmp[base+3]; facelets[base+8]=tmp[base+6];
+        }
+    };
+
+    auto rotate_ring = [&](const int r1[3], const int r2[3], const int r3[3], const int r4[3], bool is_cw) {
+        if (is_cw) {
+            for(int i=0; i<3; i++) {
+                facelets[r2[i]]=tmp[r1[i]]; facelets[r3[i]]=tmp[r2[i]];
+                facelets[r4[i]]=tmp[r3[i]]; facelets[r1[i]]=tmp[r4[i]];
+            }
+        } else {
+            for(int i=0; i<3; i++) {
+                facelets[r4[i]]=tmp[r1[i]]; facelets[r3[i]]=tmp[r4[i]];
+                facelets[r2[i]]=tmp[r3[i]]; facelets[r1[i]]=tmp[r2[i]];
+            }
+        }
+    };
+
+    if (idx == 0) { // Front - face 18
+        const int r1[3]={6,7,8}, r2[3]={44,41,38}, r3[3]={29,28,27}, r4[3]={9,12,15};
+        rotate_ring(r1, r2, r3, r4, cw);
+        rotate_face(18, !cw); 
+    } 
+    else if (idx == 1) { // Standing (S)
+        const int r1[3]={3,4,5}, r2[3]={43,40,37}, r3[3]={32,31,30}, r4[3]={10,13,16};
+        rotate_ring(r1, r2, r3, r4, cw);
+    } 
+    else if (idx == 2) { // Back - face 45
+        const int r1[3]={0,1,2}, r2[3]={42,39,36}, r3[3]={35,34,33}, r4[3]={11,14,17};
+        rotate_ring(r1, r2, r3, r4, cw);
+        rotate_face(45, cw);
+    }
 }
 
 void Rubik::handleKey(int key, int mods,char CURRENT_AXIS){
 	ShapeNode* target = this;
 
-    if(selected_part != -1){
+    if(selected_part != -1)
         target = children[selected_part];
-    }
 	
     Matrix* mat = &(target->Mat);
 

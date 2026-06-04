@@ -20,25 +20,22 @@
 
 #include <iostream>
 #include <string>
-
+#include <sstream>
 #include <queue>
+#include <map>
+#include <random>
 
 #include "Shape.h"
 #include "Builder.h"
+#include "Kociemba.h"
+#include "solver.hpp"
 
 World* mundito=nullptr;
 GLuint VAO,VBO,EBO;
 unsigned int NUM_REBANADAS=4,SELECT_REBANDA=0;
 char CURRENT_AXIS = 'z';
-Pizza* pizza=nullptr;
-Piramid* piramid=nullptr;
-Cube* cube=nullptr;
-Sphere* sphere = nullptr;
-Tower* tower=nullptr;
-Robot* robot=nullptr;
 Camera* cam=nullptr;
 Animator* anim=nullptr;
-Trapecio* trape=nullptr;
 Rubik* rubik=nullptr;
 bool Target_free=false;
 float dt=0.0f,lastX=0.0f,lastY=0.0f;
@@ -54,6 +51,7 @@ public:
     int layer; // 1..6
 };
 std::queue<Movement> rubikAnimations;
+std::queue<Movement> solutionQueue;
 
 //------------- SECCION DE TESTS ---------------//
 void tests_anim(){
@@ -99,7 +97,39 @@ void rotation_V_rubik(){
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'N');
 }
 
-void rubik_add_animations(){
+// to mess
+void rubik_add_animations(int nMoves = 15) {
+    while (!rubikAnimations.empty())
+        rubikAnimations.pop();
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    // 0=v - 1=h - 2=d
+    std::uniform_int_distribution<int> typeDist(0, 2);
+    // 0 = -90 - 1 = 90
+    std::uniform_int_distribution<int> angleDist(0, 1);
+    for (int i = 0; i < nMoves; i++) {
+        char type;
+        int layer;
+        switch (typeDist(gen)) {
+            case 0:
+                type = 'v';
+                layer = std::uniform_int_distribution<int>(4, 6)(gen);
+                break;
+            case 1:
+                type = 'h';
+                layer = std::uniform_int_distribution<int>(1, 3)(gen);
+                break;
+            case 2:
+                type = 'd';
+                layer = std::uniform_int_distribution<int>(7, 9)(gen);
+                break;
+        }
+        float angle = angleDist(gen) ? 90.0f : -90.0f;
+        rubikAnimations.push({type, angle, layer});
+    }
+}
+/*
+void rubik_add_animations() {
 	while(!rubikAnimations.empty())
 		rubikAnimations.pop();
 
@@ -112,50 +142,178 @@ void rubik_add_animations(){
 	rubikAnimations.push({'v',-90,5});
 	rubikAnimations.push({'v',-90,6});
 	rubikAnimations.push({'h',90,3});
+	rubikAnimations.push({'d',90,8});
+	rubikAnimations.push({'d',-90,7});
 	rubikAnimations.push({'h',90,3});
 	rubikAnimations.push({'h',-90,2});
 	rubikAnimations.push({'h',-90,2});
 	rubikAnimations.push({'h',-90,1});
+	rubikAnimations.push({'d',-90,7});
+	rubikAnimations.push({'d',90,8});
 	rubikAnimations.push({'h',90,1});
 	rubikAnimations.push({'v',-90,4});
 	rubikAnimations.push({'v',-90,4});
+	rubikAnimations.push({'d',-90,7});
+	rubikAnimations.push({'d',90,8});
+	rubikAnimations.push({'d',-90,9});
+	rubikAnimations.push({'d',-90,9});
 }
+*/
 
-void tests_triple(){
+// to solve
+void load_solution_kociemba(const std::vector<std::string>& solution) {
+    while(!solutionQueue.empty())
+        solutionQueue.pop();
 
-	// CUIDADO CON DOBLE RELEASE
-	// TEST Piramid
-	Animation_Step* movePiramid = new Animation_Step(piramid, 4.0f, 'a', 5.0f, 'x', 'W');
-	Animation_Step* movePiramid2 = new Animation_Step(piramid, 4.0f, 'a', 5.0f, 'y', 'W');
-	Animation_Step* movePiramid3 = new Animation_Step(piramid, 4.0f, 'a', -5.0f, 'z', 'W');
+    for (const std::string& move : solution) {
+        if (move.empty())
+			continue;
 
-	// Test Cubo
-	Animation_Step* rotateCube = new Animation_Step(cube, 4.0f, 'd', 90.0f, 'y', 'W');
-	Animation_Step* rotateCube1 = new Animation_Step(cube, 4.0f, 'd', 90.0f, 'x', 'W');
-	Animation_Step* rotateCube2 = new Animation_Step(cube, 4.0f, 'd', 90.0f, 'z', 'W');
-
-	// Test Esfera
-	Animation_Step* scale1 = new Animation_Step(sphere, 12.0f, 'g', 1.5f, 'x', 'W');
-
-	anim->Add_Animations(std::vector<Animation_Step*>{movePiramid,rotateCube,scale1,movePiramid2,rotateCube1,movePiramid3,rotateCube2}, 'S');
+        char face = move[0];
+        char type = 'h';
+        int layer = 1;
+        float angle = 90.0f;
+        int repetitions = 1;
+		// mapping
+        switch (face) {
+            case 'U':
+                type = 'h'; 
+                layer = 3; // h_set[2]
+				angle = -90.0f;
+                break;
+            case 'D':
+                type = 'h'; 
+                layer = 1; // h_set[0]
+        		angle = 90.0f;
+                break;
+            case 'R':
+                type = 'v'; 
+                layer = 6; // v_set[2]
+				angle = -90.0f;
+                break;
+            case 'L':
+                type = 'v'; 
+                layer = 4; // v_set[0]
+        		angle = 90.0f;
+                break;
+            case 'F':
+                type = 'd'; 
+                layer = 7; // d_set[0]
+				angle = -90.0f;
+                break;
+            case 'B':
+                type = 'd'; 
+                layer = 9; // d_set[2]
+        		angle = 90.0f;
+                break;
+            default:
+                continue; 
+        }
+		// check ' or 2
+		float final_angle = angle;
+        if (move.size() > 1) {
+            if (move[1] == '\'')
+                final_angle = -angle;
+            else if (move[1] == '2') {
+                repetitions = 2;
+            }
+        }
+		// to queue
+        for (int i = 0; i < repetitions; i++) {
+            Movement mov;
+            mov.type = type;
+            mov.angle = final_angle;
+            mov.layer = layer;
+            solutionQueue.push(mov);
+        }
+    }
 }
+// send to kociemba
+void pass_rubik_state_kociemba() {
 
-void alinear(){
-	// Test Cubo
-	Animation_Step* mov1 = new Animation_Step(trape, 0.1f, 'a', 1.5f, 'x', 'W');
+	char normalized[55];
+	std::map<char,char> remap;
 
-	// Test Esfera
-	Animation_Step* mov2 = new Animation_Step(pizza, 0.1f, 'a', -1.5f, 'x', 'W');
+	remap[rubik->facelets[4]] = 'U';
+	remap[rubik->facelets[13]] = 'R';
+	remap[rubik->facelets[22]] = 'F';
+	remap[rubik->facelets[31]] = 'D';
+	remap[rubik->facelets[40]] = 'L';
+	remap[rubik->facelets[49]] = 'B';
+
+	for(int i=0;i<54;i++)
+		normalized[i] = remap[ rubik->facelets[i] ];
+
+	normalized[54] = '\0';
 	
-	Animation_Step* mov3 = new Animation_Step(piramid, 0.1f, 'd', -90.0f, 'z', 'W');
+	std::string facelets_r(rubik->facelets, 54);
+	std::string facelets_n(normalized, 54);
 
-	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3}, 'N');
+	std::cout<<"\nRubik facelets:\n"<<facelets_r<<"\n";
+	std::cout<<"\nNormalized facelets:\n"<<facelets_n<<"\n";
+
+	Cube c = Cube::fromString(facelets_n);
+	std::string sol = solve(c);
+
+	std::vector<std::string> solution;
+
+	std::istringstream ss(sol);
+	std::string mov;
+
+	while (ss >> mov)
+		solution.push_back(mov);
 	
-};
+	std::cout<<"Solution:\n";
+	for(auto& s : solution)
+		std::cout<<s<<"-";
+	std::cout<<"\n";
+	
+	/*	
+	std::string real_facelets(54, ' ');
+	// UP
+	for(int i = 0; i < 9; i++)
+		real_facelets[i] = rubik->facelets[i];
+	// BACK
+	real_facelets[9]  = rubik->facelets[45]; real_facelets[10] = rubik->facelets[46]; real_facelets[11] = rubik->facelets[47];
+	real_facelets[21] = rubik->facelets[48]; real_facelets[22] = rubik->facelets[49]; real_facelets[23] = rubik->facelets[50];
+	real_facelets[33] = rubik->facelets[51]; real_facelets[34] = rubik->facelets[52]; real_facelets[35] = rubik->facelets[53];
+	// LEFT
+	real_facelets[12] = rubik->facelets[36]; real_facelets[13] = rubik->facelets[37]; real_facelets[14] = rubik->facelets[38];
+	real_facelets[24] = rubik->facelets[39]; real_facelets[25] = rubik->facelets[40]; real_facelets[26] = rubik->facelets[41];
+	real_facelets[36] = rubik->facelets[42]; real_facelets[37] = rubik->facelets[43]; real_facelets[38] = rubik->facelets[44];
+	// FRONT
+	real_facelets[15] = rubik->facelets[18]; real_facelets[16] = rubik->facelets[19]; real_facelets[17] = rubik->facelets[20];
+	real_facelets[27] = rubik->facelets[21]; real_facelets[28] = rubik->facelets[22]; real_facelets[29] = rubik->facelets[23];
+	real_facelets[39] = rubik->facelets[24]; real_facelets[40] = rubik->facelets[25]; real_facelets[41] = rubik->facelets[26];
+	// RIGHT
+	real_facelets[18] = rubik->facelets[9];  real_facelets[19] = rubik->facelets[10]; real_facelets[20] = rubik->facelets[11];
+	real_facelets[30] = rubik->facelets[12]; real_facelets[31] = rubik->facelets[13]; real_facelets[32] = rubik->facelets[14];
+	real_facelets[42] = rubik->facelets[15]; real_facelets[43] = rubik->facelets[16]; real_facelets[44] = rubik->facelets[17];
+	// DOWN
+	for(int i = 0; i < 9; i++)
+		real_facelets[45 + i] = rubik->facelets[27 + i];
+	*/
+	
+	/*
+	KociembaSolver::initTables();
+	std::string send_facelets(rubik->facelets);
+	std::cout<<"\nrubik facelets:\n"<<send_facelets<<"\n";
+	//std::cout<<"\ntranslated:\n"<<real_facelets<<"\n";
+	std::vector<std::string> solution = KociembaSolver::solve(send_facelets);
+	std::cout<<"\nsolution:\n";
+	for(auto& s : solution)
+		std::cout<<s<<" ";
+	std::cout<<"\n";
+	*/
+
+	//std::vector<std::string> solution1{"U","D","R","L","F","B"};
+	//std::vector<std::string> solution1{"U'","D'","R'","L'","F'","B'"};
+	//std::vector<std::string> solution1{"U2","D2","R2","L2","F2","B2"};
+
+	load_solution_kociemba(solution);
+}
 
 void orbit(){
-
-
 	// rotar la cámara 90 grados en yaw en 4 segundos
 	Animation_Step* rotateCam = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
 	Animation_Step* rotateCam1 = new Animation_Step(cam, 4.0f, 'o', 360.0f, 'y', 'W');
@@ -163,46 +321,6 @@ void orbit(){
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
 	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam1}, 'S');
 }
-
-void rotate_piramid(){
-
-	// rotar la cámara 90 grados en yaw en 4 segundos
-	Animation_Step* rotateCam = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'x', 'L');
-	Animation_Step* rotateCam1 = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'y', 'L');
-	Animation_Step* rotateCam2 = new Animation_Step(piramid, 4.0f, 'd', 360.0f, 'z', 'L');
-
-	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam}, 'S');
-	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam1}, 'S');
-	anim->Add_Animations(std::vector<Animation_Step*>{rotateCam2}, 'S');
-}
-
-void mov_trap(){
-
-
-	Animation_Step* mov1 = new Animation_Step(trape, 5.0f, 'a', 1.0f, 'x', 'W');
-	Animation_Step* mov2 = new Animation_Step(trape, 5.0f, 'a', 1.0f, 'y', 'W');
-	Animation_Step* mov3 = new Animation_Step(trape, 5.0f, 'a', -1.0f, 'x', 'W');
-	Animation_Step* mov4 = new Animation_Step(trape, 5.0f, 'a', -1.0f, 'y', 'W');
-
-
-	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3,mov4}, 'S');
-}
-
-void mov_trap_2(){
-
-	Animation_Step* mov1 = new Animation_Step(pizza, 1.0f, 'a', 10.0f, 'x', 'W');
-	Animation_Step* mov2 = new Animation_Step(pizza, 1.0f, 'a', 10.0f, 'y', 'W');
-	Animation_Step* mov3 = new Animation_Step(pizza, 1.0f, 'a', -10.0f, 'x', 'W');
-	Animation_Step* mov4 = new Animation_Step(pizza, 1.0f, 'a', -10.0f, 'y', 'W');
-
-
-	anim->Add_Animations(std::vector<Animation_Step*>{mov1,mov2,mov3,mov4}, 'S');
-}
-
-
-//------------ FIN TESTS xd -------------------//
-
-
 
 void general_Menu(){
 	std::cout << "===================================" << std::endl;
@@ -297,16 +415,19 @@ void key_callback(GLFWwindow* window,int key,int scan,int action,int mods){
 			rotation_H_rubik();
 			break;
 		}
-		
 		case GLFW_KEY_S:{
 			// rubik vertical rotation animnation
 			rotation_V_rubik();
 			break;
 		}
-		
 		case GLFW_KEY_Q:{
 			// rubik sequence of movements
-			rubik_add_animations();
+			rubik_add_animations(8);
+			break;
+		}
+		case GLFW_KEY_W:{
+			// rubik solver
+			pass_rubik_state_kociemba();
 			break;
 		}
 		
@@ -442,13 +563,6 @@ int main(){
 	anim = Builder::BuildAnimator();
 	
 	std::cout << "CONSTRUYENDO RUBIK " << std::endl;
-	//pizza = Builder::BuildPizzaScene(mundito,NUM_REBANADAS); // Pizza izq
-	//trape=Builder::BuildTrapecio(mundito); // Trapecio derecha
-	//piramid = Builder::BuildPyramidScene(mundito,0.5f); // Piramedio medio
-	//cube = Builder::BuildCubeScene(mundito,{0.0f,0.0f,0.0f});
-	//sphere=Builder::BuildSphereScene(mundito,0.5f);
-	//tower = Builder::BuildTowerScene(mundito);
-	//robot = Builder::BuildRobotScene(mundito);
 	auto inicio = std::chrono::high_resolution_clock::now();
 	rubik=Builder::BuildRubik(mundito);
 	auto fin = std::chrono::high_resolution_clock::now();
@@ -522,6 +636,14 @@ int main(){
 			}
 			rubik->do_permutation = false;
 			//rubik->PrintCamadas();
+
+			// print facelets
+			for(int i = 0; i < 54; i++) {
+				if(!(i % 9))
+					std::cout<<" - ";
+				std::cout<<rubik->facelets[i];
+			}
+			std::cout<<"\n";
 		}
 		
 		// for rubik sequence animation
@@ -532,6 +654,19 @@ int main(){
 				rubik->horizontal_rotation(mov.angle, mov.layer, anim);
 			else if(mov.type == 'v')
 				rubik->vertical_rotation(mov.angle, mov.layer, anim);
+			else if(mov.type == 'd')
+				rubik->deep_rotation(mov.angle, mov.layer, anim);
+		}
+		// for rubik solver animation
+		if(anim->animations.empty() && !rubik->do_permutation && !solutionQueue.empty()){
+			Movement mov = solutionQueue.front();
+			solutionQueue.pop();
+			if(mov.type == 'h')
+				rubik->horizontal_rotation(mov.angle, mov.layer, anim);
+			else if(mov.type == 'v')
+				rubik->vertical_rotation(mov.angle, mov.layer, anim);
+			else if(mov.type == 'd')
+				rubik->deep_rotation(mov.angle, mov.layer, anim);
 		}
 		
 		// Para seguir

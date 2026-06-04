@@ -7,10 +7,10 @@
 Face::Face():triangle_start(0), lines_Start(0), points_Start(0) {}
 
 
-Cube::Cube(World* world, const Point& cent, std::vector<RGB> colors, int tp, std::string name) :
+Cubee::Cubee(World* world, const Point& cent, std::vector<RGB> colors, int tp, std::string name) :
 	ShapeNode(world, 0, name), center(cent), sector_Start(0), lines_Start(0), points_Start(0), type(tp),faceColors(colors) {}
 
-void Cube::Generate(){
+void Cubee::Generate(){
     float s = 0.2f;
 
     Point v[8];
@@ -73,7 +73,7 @@ void Cube::Generate(){
     IsDrawable = true;
 }
 
-void Cube::DrawGeometry(const Matrix& parent)
+void Cubee::DrawGeometry(const Matrix& parent)
 {
     Shader.use();
     Shader.SetMatrix(parent);
@@ -110,7 +110,7 @@ void Cube::DrawGeometry(const Matrix& parent)
     */
 }
 
-void Cube::handleKey(int key, int mods,char CURRENT_AXIS){
+void Cubee::handleKey(int key, int mods,char CURRENT_AXIS){
 	ShapeNode* target = this;
 
     if(selected_part != -1){
@@ -166,12 +166,12 @@ void Cube::handleKey(int key, int mods,char CURRENT_AXIS){
 	}
 }
 
-void Cube::printMenu(){
+void Cubee::printMenu(){
 	std::cout << "===================================" << std::endl;
     std::cout << "|        Bienvenido a             |" << std::endl;
-    std::cout << "|     Simulador de Cube           |" << std::endl;
+    std::cout << "|     Simulador de Cubee           |" << std::endl;
     std::cout << "|                                 |" << std::endl;
-    std::cout << "|  Q. Generar Cube (default=4)    |" << std::endl;
+    std::cout << "|  Q. Generar Cubee (default=4)    |" << std::endl;
     std::cout << "|  W. Configurar                  |" << std::endl;
     std::cout << "|  R. Seleccion parte (0-N)       |" << std::endl;
 	std::cout << "|  d. Rotar (0.1)                 |" << std::endl;

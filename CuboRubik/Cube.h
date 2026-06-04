@@ -18,7 +18,7 @@ public:
 };
 
 
-class Cube: public ShapeNode{
+class Cubee: public ShapeNode{
 public:
 	Point center;
 	unsigned int sector_Start,lines_Start,points_Start;
@@ -26,7 +26,7 @@ public:
 	std::vector<RGB> faceColors;
 	int type;
 public:
-	Cube(World* world, const Point& cent, std::vector<RGB> colors={ColorTable[LIMA],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[MORADO],ColorTable[NARANJA],ColorTable[DORADO]}, int tp=0, std::string name="Cube");
+	Cubee(World* world, const Point& cent, std::vector<RGB> colors={ColorTable[LIMA],ColorTable[VERDE],ColorTable[BLANCO],ColorTable[MORADO],ColorTable[NARANJA],ColorTable[DORADO]}, int tp=0, std::string name="Cube");
 	void Generate() override;
 	void DrawGeometry(const Matrix& parent) override;
 	void printMenu() override;
